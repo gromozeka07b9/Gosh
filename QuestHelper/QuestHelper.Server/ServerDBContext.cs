@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using QuestHelper.Server.Models;
 
 namespace QuestHelper.Server
@@ -31,7 +32,7 @@ namespace QuestHelper.Server
         public DbSet<User> User { get; set; }
         public DbSet<OauthUser> OauthUser { get; set; }
 
-        public static DbContextOptions<ServerDbContext> GetOptionsContextDbServer(bool isFake = false)
+        public static DbContextOptions<ServerDbContext> GetOptionsContextDbServer(IConfiguration configuration, bool isFake = false)
         {
             if (isFake)
             {
@@ -39,8 +40,8 @@ namespace QuestHelper.Server
             }
             else
             {
-                string dbLogin = System.Environment.GetEnvironmentVariable("GoshDbLogin");
-                string dbPassword = System.Environment.GetEnvironmentVariable("GoshDbPassword");
+                string dbLogin = configuration.GetValue<string>("GoshDbLogin");
+                string dbPassword = configuration.GetValue<string>("GoshDbPassword");
                 if (string.IsNullOrEmpty(dbLogin) || string.IsNullOrEmpty(dbPassword))
                 {
                     string errorMsg = "Error reading DB login or password!";
@@ -52,6 +53,7 @@ namespace QuestHelper.Server
                 return new DbContextOptionsBuilder<ServerDbContext>().UseMySql(connectionString).Options;
             }
         }
+        
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
         }

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace QuestHelper.Server.Controllers.v2
 {
@@ -18,8 +19,13 @@ namespace QuestHelper.Server.Controllers.v2
     [Route("api/v2/[controller]")]
     public class RoutePointsController : Controller
     {
-        private DbContextOptions<ServerDbContext> _dbOptions = ServerDbContext.GetOptionsContextDbServer();
+        private DbContextOptions<ServerDbContext> _dbOptions;
 
+        public RoutePointsController(IConfiguration configuration)
+        {
+            _dbOptions = ServerDbContext.GetOptionsContextDbServer(configuration);
+        }
+        
         /// <summary>
         /// List all available route points for user
         /// </summary>

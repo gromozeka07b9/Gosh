@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using QuestHelper.Server.Managers;
 using QuestHelper.Server.Models;
 
@@ -16,8 +17,13 @@ namespace QuestHelper.Server.Controllers.Points
     [Route("api/[controller]")]
     public class RoutePointsController : Controller
     {
-        private DbContextOptions<ServerDbContext> _dbOptions = ServerDbContext.GetOptionsContextDbServer();
+        private DbContextOptions<ServerDbContext> _dbOptions;
 
+        public RoutePointsController(IConfiguration configuration)
+        {
+            _dbOptions = ServerDbContext.GetOptionsContextDbServer(configuration);
+        }
+        
         [HttpGet("{RoutePointId}")]
         public IActionResult Get(string RoutePointId)
         {

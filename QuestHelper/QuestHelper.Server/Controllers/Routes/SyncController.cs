@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using QuestHelper.Server.Auth;
 using QuestHelper.Server.Managers;
@@ -18,8 +19,13 @@ namespace QuestHelper.Server.Controllers.Routes
     [Route("api/routes/[controller]")]
     public class SyncController : Controller
     {
-        private DbContextOptions<ServerDbContext> _dbOptions = ServerDbContext.GetOptionsContextDbServer();
+        private DbContextOptions<ServerDbContext> _dbOptions;
 
+        public SyncController(IConfiguration configuration)
+        {
+            _dbOptions = ServerDbContext.GetOptionsContextDbServer(configuration);
+        }
+        
         [HttpPost]
         public IActionResult Post([FromBody]SyncObjectStatus syncObject)
         {

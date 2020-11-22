@@ -9,7 +9,7 @@ namespace QuestHelper.Server.Managers
 {
     public class AvailableRoutes
     {
-        private DbContextOptions<ServerDbContext> _dbOptions = ServerDbContext.GetOptionsContextDbServer();
+        private DbContextOptions<ServerDbContext> _dbOptions;
 
         public AvailableRoutes(DbContextOptions<ServerDbContext>  dbOptions)
         {

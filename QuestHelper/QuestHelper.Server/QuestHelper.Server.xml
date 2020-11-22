@@ -104,7 +104,7 @@
             Методы обработки запросов на распознавание аудиофайлов
             </summary>
         </member>
-        <member name="M:QuestHelper.Server.Controllers.SpeechToText.SpeechToTextController.#ctor">
+        <member name="M:QuestHelper.Server.Controllers.SpeechToText.SpeechToTextController.#ctor(Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>
             Распознавание аудио
             </summary>
@@ -187,7 +187,7 @@
             Распознавание аудиофайлов в текст
             </summary>
         </member>
-        <member name="M:QuestHelper.Server.Integration.SpeechToTextProcess.#ctor(System.String)">
+        <member name="M:QuestHelper.Server.Integration.SpeechToTextProcess.#ctor(System.String,Microsoft.EntityFrameworkCore.DbContextOptions{QuestHelper.Server.ServerDbContext})">
             <summary>
             Параметр - путь к каталогу сервера, где лежат файлы
             </summary>

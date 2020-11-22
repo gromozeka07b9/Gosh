@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace QuestHelper.Server.Controllers.Medias
 {
@@ -17,12 +18,13 @@ namespace QuestHelper.Server.Controllers.Medias
     [Route("api/[controller]")]
     public class RoutePointMediaObjectsController : Controller
     {
-        private DbContextOptions<ServerDbContext> _dbOptions = ServerDbContext.GetOptionsContextDbServer();
+        private DbContextOptions<ServerDbContext> _dbOptions;
         private string _pathToMediaCatalog = string.Empty;
         private MediaManager _mediaManager;
 
-        public RoutePointMediaObjectsController()
+        public RoutePointMediaObjectsController(IConfiguration configuration)
         {
+            _dbOptions = ServerDbContext.GetOptionsContextDbServer(configuration);
             _mediaManager = new MediaManager();
             _pathToMediaCatalog = _mediaManager.PathToMediaCatalog;
         }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
 using QuestHelper.Server.Managers;
 using QuestHelper.Server.Models;
 
@@ -16,7 +17,13 @@ namespace QuestHelper.Server.Controllers
     
     public class GalleryController : Controller
     {
-        private DbContextOptions<ServerDbContext> _dbOptions = ServerDbContext.GetOptionsContextDbServer();
+        private DbContextOptions<ServerDbContext> _dbOptions;
+        private IConfiguration _configuration;
+
+        public GalleryController(IConfiguration configuration)
+        {
+            _dbOptions = ServerDbContext.GetOptionsContextDbServer(configuration);
+        }
         
         [HttpGet("gallery/{SharedRouteRef}")]
         public IActionResult Gallery(string SharedRouteRef)
@@ -67,10 +74,10 @@ namespace QuestHelper.Server.Controllers
                 if (!mediaManager.SharedMediaFileExist(imgFileName))
                 {
                     bool copied = mediaManager.CopyMediaFileToSharedCatalog(imgFileName);
-                    /*if (!copied)
+                    if (!copied)
                     {
-                        imgFileName = imgPreviewFileName;
-                    }*/
+                        Console.WriteLine("Error while coping file:" + imgFileName);
+                    }
                 }
                 if (!mediaManager.SharedMediaFileExist(imgPreviewFileName))
                 {

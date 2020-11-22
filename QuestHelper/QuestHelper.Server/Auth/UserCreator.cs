@@ -6,10 +6,11 @@ namespace QuestHelper.Server.Auth
 {
     public class UserCreator
     {
-        private DbContextOptions<ServerDbContext> _dbOptions = ServerDbContext.GetOptionsContextDbServer();
+        private DbContextOptions<ServerDbContext> _dbOptions;
 
-        public UserCreator()
+        public UserCreator(DbContextOptions<ServerDbContext> dbOptions)
         {
+            _dbOptions = dbOptions;
         }
 
         internal User Create(TokenRequest request, bool isDemoUser)

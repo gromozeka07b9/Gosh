@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using QuestHelper.Server.Managers;
 using QuestHelper.SharedModelsWS;
 
@@ -18,7 +19,12 @@ namespace QuestHelper.Server.Controllers
     [Route("api/[controller]")]
     public class FeedController : Controller
     {
-        private DbContextOptions<ServerDbContext> _dbOptions = ServerDbContext.GetOptionsContextDbServer();
+        private DbContextOptions<ServerDbContext> _dbOptions;
+
+        public FeedController(IConfiguration configuration)
+        {
+            _dbOptions = ServerDbContext.GetOptionsContextDbServer(configuration);
+        }
         /// <summary>
         /// Get feed with filter
         /// </summary>

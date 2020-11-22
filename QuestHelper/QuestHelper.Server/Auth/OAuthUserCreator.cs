@@ -7,10 +7,11 @@ namespace QuestHelper.Server.Auth
 {
     public class OAuthUserCreator
     {
-        private DbContextOptions<ServerDbContext> _dbOptions = ServerDbContext.GetOptionsContextDbServer();
+        private DbContextOptions<ServerDbContext> _dbOptions;
 
-        public OAuthUserCreator()
+        public OAuthUserCreator(DbContextOptions<ServerDbContext> dbOptions)
         {
+            _dbOptions = dbOptions;
         }
 
         internal OauthUser CreateGoogleUser(OAuthTokenRequest request, User user)

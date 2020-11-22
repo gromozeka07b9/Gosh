@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using QuestHelper.Server.Managers;
 using QuestHelper.Server.Models;
 using QuestHelper.SharedModelsWS;
@@ -22,11 +23,12 @@ namespace QuestHelper.Server.Controllers.v2
     [Route("api/v2/[controller]")]
     public class PoisController : Controller
     {
-        private DbContextOptions<ServerDbContext> _dbOptions = ServerDbContext.GetOptionsContextDbServer();
+        private DbContextOptions<ServerDbContext> _dbOptions;
         private MediaManager _mediaManager;
         private string _pathToMediaCatalog;
-        public PoisController()
+        public PoisController(IConfiguration configuration)
         {
+            _dbOptions = ServerDbContext.GetOptionsContextDbServer(configuration);
             _mediaManager = new MediaManager();
             _pathToMediaCatalog = _mediaManager.PathToMediaCatalog;
         }

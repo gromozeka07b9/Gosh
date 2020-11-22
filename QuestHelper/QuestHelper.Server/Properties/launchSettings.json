@@ -20,10 +20,16 @@
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "api",
+      "applicationUrl": "http://localhost:31192/",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "applicationUrl": "http://localhost:31192/"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "GoshDbLogin": "",
+        "GoshDbPassword": "",
+        "GoshYandexFolderId": "",
+        "GoshYandexApiKey": "",
+        "GOSH_IMAGES_PATH": "",
+        "GOSH_IMAGES_SHARED_PATH": ""
+      }
     }
   }
 }

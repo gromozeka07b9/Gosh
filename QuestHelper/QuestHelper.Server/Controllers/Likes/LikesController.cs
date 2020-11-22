@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace QuestHelper.Server.Controllers.Likes
 {
@@ -18,8 +19,13 @@ namespace QuestHelper.Server.Controllers.Likes
     [Route("api/[controller]")]
     public class LikesController : Controller
     {
-        private DbContextOptions<ServerDbContext> _dbOptions = ServerDbContext.GetOptionsContextDbServer();
+        private DbContextOptions<ServerDbContext> _dbOptions;
 
+        public LikesController(IConfiguration configuration)
+        {
+            _dbOptions = ServerDbContext.GetOptionsContextDbServer(configuration);
+        }
+        
         [HttpGet("/route/{routeId}")]
         public IActionResult RouteGetLikes(string routeId)
         {

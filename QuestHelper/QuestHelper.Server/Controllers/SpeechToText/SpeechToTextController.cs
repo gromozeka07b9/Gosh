@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace QuestHelper.Server.Controllers.SpeechToText
 {
@@ -17,15 +18,16 @@ namespace QuestHelper.Server.Controllers.SpeechToText
     [Route("api/[controller]")]
     public class SpeechToTextController : Controller
     {
-        private DbContextOptions<ServerDbContext> _dbOptions = ServerDbContext.GetOptionsContextDbServer();
+        private DbContextOptions<ServerDbContext> _dbOptions;
         private string _pathToMediaCatalog = string.Empty;
         private MediaManager _mediaManager;
         
         /// <summary>
         /// Распознавание аудио
         /// </summary>
-        public SpeechToTextController()
+        public SpeechToTextController(IConfiguration configuration)
         {
+            _dbOptions = ServerDbContext.GetOptionsContextDbServer(configuration);
             _mediaManager = new MediaManager();
             _pathToMediaCatalog = _mediaManager.PathToMediaCatalog;
         }
@@ -53,8 +55,8 @@ namespace QuestHelper.Server.Controllers.SpeechToText
         {
             string userId = IdentityManager.GetUserId(HttpContext);
             
-            SpeechToTextProcess speachToTextProcess = new SpeechToTextProcess(_pathToMediaCatalog);
-            var parseResult = await speachToTextProcess.TrySpeechParseMediaAsync(id);
+            SpeechToTextProcess speechToTextProcess = new SpeechToTextProcess(_pathToMediaCatalog, _dbOptions);
+            var parseResult = await speechToTextProcess.TrySpeechParseMediaAsync(id);
             Response.StatusCode = parseResult.Result ? 200 : 500;
 
             return new ObjectResult(parseResult.Text);

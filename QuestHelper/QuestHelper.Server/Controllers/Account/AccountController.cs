@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using QuestHelper.Server.Auth;
@@ -20,8 +21,13 @@ namespace QuestHelper.Server.Controllers.Account
     [Route("api/[controller]")]
     public class AccountController : Controller
     {
-        private DbContextOptions<ServerDbContext> _dbOptions = ServerDbContext.GetOptionsContextDbServer();
+        private DbContextOptions<ServerDbContext> _dbOptions;
 
+        public AccountController(IConfiguration configuration)
+        {
+            _dbOptions = ServerDbContext.GetOptionsContextDbServer(configuration);
+        }
+        
         [HttpPost]
         public async Task Token([FromBody]TokenRequest request)
         {
@@ -70,7 +76,7 @@ namespace QuestHelper.Server.Controllers.Account
                 User user = _db.User.FirstOrDefault(x => x.Name == request.Username && x.Role == "demo");
                 if (user == null)
                 {
-                    UserCreator userCreator = new UserCreator();
+                    UserCreator userCreator = new UserCreator(_dbOptions);
                     user = userCreator.Create(request, true);
                 }
                 JwtResponseMaker jwtMaker = new JwtResponseMaker();
@@ -99,7 +105,7 @@ namespace QuestHelper.Server.Controllers.Account
                 User user = _db.User.FirstOrDefault(x => x.Email == request.Email);
                 if (user == null)
                 {
-                    UserCreator userCreator = new UserCreator();
+                    UserCreator userCreator = new UserCreator(_dbOptions);
                     user = userCreator.Create(request, false);
                     if (user != null)
                     {

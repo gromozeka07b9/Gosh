@@ -1,7 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
+FROM mcr.microsoft.com/dotnet/core/aspnet:2.2
 COPY bin/Release/netcoreapp2.2/publish gosh.server/
 WORKDIR /gosh.server
-ENV CRONEXPRESSION="0 0 18 1/1 * ? *"
-ENV GOSHBOTTOKEN=""
-ENV GOSHBOTCHATID="@gosh_life"
 ENTRYPOINT ["dotnet", "QuestHelper.Server.dll"]

@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.Extensions.Configuration;
 using Route = QuestHelper.SharedModelsWS.Route;
 using RoutePoint = QuestHelper.SharedModelsWS.RoutePoint;
 
@@ -20,11 +21,12 @@ namespace QuestHelper.Server.Controllers.RouteSync
     [Route("api/route")]//Внимательно, маршрут отличается от контроллера!
     public class RouteSyncController : Controller
     {
-        private DbContextOptions<ServerDbContext> _dbOptions = ServerDbContext.GetOptionsContextDbServer();
+        private DbContextOptions<ServerDbContext> _dbOptions;
         private RouteManager _routeManager;
 
-        public RouteSyncController()
+        public RouteSyncController(IConfiguration configuration)
         {
+            _dbOptions = ServerDbContext.GetOptionsContextDbServer(configuration);
             _routeManager = new RouteManager(_dbOptions);
         }
 

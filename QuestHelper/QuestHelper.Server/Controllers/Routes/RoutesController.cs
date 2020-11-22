@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 
 namespace QuestHelper.Server.Controllers.Routes
 {
@@ -20,11 +21,15 @@ namespace QuestHelper.Server.Controllers.Routes
     [Obsolete]
     public class RoutesController : Controller
     {
-        private DbContextOptions<ServerDbContext> _dbOptions = ServerDbContext.GetOptionsContextDbServer();
+        private DbContextOptions<ServerDbContext> _dbOptions;
         private MediaManager _mediaManager;
         private PoiManager _poiManager;
         private string _pathToMediaCatalog = string.Empty;
 
+        public RoutesController(IConfiguration configuration)
+        {
+            _dbOptions = ServerDbContext.GetOptionsContextDbServer(configuration);
+        }
         public class ShareRequest
         {
             public string RouteIdForShare;

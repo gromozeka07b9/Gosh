@@ -17,16 +17,17 @@ namespace QuestHelper.Server.Integration
     /// </summary>
     public class SpeechToTextProcess
     {
-        private DbContextOptions<ServerDbContext> _dbOptions = ServerDbContext.GetOptionsContextDbServer();
+        private DbContextOptions<ServerDbContext> _dbOptions;
         private string _pathToMediaCatalog = string.Empty;
 
         /// <summary>
         /// Параметр - путь к каталогу сервера, где лежат файлы
         /// </summary>
         /// <param name="pathToMediaCatalog"></param>
-        public SpeechToTextProcess(string pathToMediaCatalog)
+        public SpeechToTextProcess(string pathToMediaCatalog, DbContextOptions<ServerDbContext> dbOptions)
         {
             _pathToMediaCatalog = pathToMediaCatalog;
+            _dbOptions = dbOptions;
         }
 
         /// <summary>

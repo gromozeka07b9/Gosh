@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using QuestHelper.Server.Auth;
@@ -19,14 +20,19 @@ namespace QuestHelper.Server.Controllers.Account
     [Route("api/account/[controller]")]
     public class GoogleController : Controller
     {
-        private DbContextOptions<ServerDbContext> _dbOptions = ServerDbContext.GetOptionsContextDbServer();
+        private DbContextOptions<ServerDbContext> _dbOptions;
+
+        public GoogleController(IConfiguration configuration)
+        {
+            _dbOptions = ServerDbContext.GetOptionsContextDbServer(configuration);
+        }
 
         [HttpPost]
         public async Task Login([FromBody]OAuthTokenRequest request)
         {
             using (var _db = new ServerDbContext(_dbOptions))
             {
-                UserCreator userCreator = new UserCreator();
+                UserCreator userCreator = new UserCreator(_dbOptions);
                 User user = _db.User.FirstOrDefault(x => x.Email == request.Email);
                 if (user == null)
                 {
@@ -36,7 +42,7 @@ namespace QuestHelper.Server.Controllers.Account
 
                 if (user != null)
                 {
-                    OAuthUserCreator oauthUserCreator = new OAuthUserCreator();
+                    OAuthUserCreator oauthUserCreator = new OAuthUserCreator(_dbOptions);
                     var OauthUser = oauthUserCreator.CreateGoogleUser(request, user);
                     if(OauthUser != null)
                     {

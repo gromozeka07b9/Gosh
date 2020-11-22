@@ -6,6 +6,7 @@ using System.Security.Claims;
 using Castle.Core.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.Configuration;
 using QuestHelper.Server.Managers;
 using Xunit;
 using Moq;
@@ -48,7 +49,7 @@ namespace QuestHelperServer.Tests
         [Fact]
         public void TestMust_GetIdentityOk()
         {
-            var options = ServerDbContext.GetOptionsContextDbServer(true);
+            var options = ServerDbContext.GetOptionsContextDbServer(null, true);
             var users = prepareUsers(options);
 
             using (var context = new ServerDbContext(options))
@@ -64,7 +65,7 @@ namespace QuestHelperServer.Tests
         public void TestMust_ValidateUserKey()
         {
             string userName = "user1";
-            var options = ServerDbContext.GetOptionsContextDbServer(true);
+            var options = ServerDbContext.GetOptionsContextDbServer(null,true);
             var users = prepareUsers(options);
 
             string userKey = users.Find(x=>x.Name == userName).TokenKey;
@@ -82,17 +83,17 @@ namespace QuestHelperServer.Tests
             string encodedStringJwt = jwt.GetEncodedJwt(testIdentity, userKey);
             jwt = null;
 
-            //проверим, что ключ тот же
+            //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ
             JwtManager jwtTest = new JwtManager();
             string userKeyTest = jwtTest.GetUserKeyFromToken(encodedStringJwt);
 
             Assert.Equal(userKey, userKeyTest);
 
-            //и проведем валидацию
+            //пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             ValidateUser validate = new ValidateUser(options, encodedStringJwt);
             Assert.True(validate.UserIsValid(userName));
 
-            //и сбросим userkey и снова проведем валидацию
+            //пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ userkey пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             var testUser = users.Find(x => x.Name == userName);
             testUser.TokenKey = Guid.NewGuid().ToString();
             UpdateUser(options, testUser);

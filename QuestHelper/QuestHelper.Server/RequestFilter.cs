@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using QuestHelper.Server.Auth;
 using QuestHelper.Server.Managers;
 
@@ -15,7 +17,8 @@ namespace QuestHelper.Server
     {
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            DbContextOptions<ServerDbContext> _dbOptions = ServerDbContext.GetOptionsContextDbServer();
+            var configuration = context.HttpContext.RequestServices.GetService<IConfiguration>();
+            DbContextOptions<ServerDbContext> _dbOptions = ServerDbContext.GetOptionsContextDbServer(configuration);
             ValidateUser validateContext = new ValidateUser(_dbOptions, BearerParser.GetTokenFromHeader(context.HttpContext.Request.Headers));
 
             if (context.HttpContext.User.Identity.Name != null)

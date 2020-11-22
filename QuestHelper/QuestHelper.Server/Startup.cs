@@ -22,6 +22,7 @@ namespace QuestHelper.Server
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<IConfiguration>(Configuration);
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
                 {
                     options.RequireHttpsMetadata = false;
