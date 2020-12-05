@@ -1,0 +1,7 @@
+docker build --tag gosh.server:1.1.50-beta.1 .
+docker run --publish 8000:8000 --detach --name srv gosh.server:1.1.50-beta.1
+env > env_file && docker run --env-file env_file --publish 8000:80 --detach --name srv3 gosh.server:1.1.50-beta.1
+docker run --publish 8000:80 --detach --name srv gosh.server:1.1.50-beta.1 -e GOSHDBLOGIN='xxx' -e GOSHDBPASSWORD='xxx' -e GOSH_IMAGES_PATH='img' -e GOSH_IMAGES_SHARED_PATH='img_shared'
+
+docker tag 1dde752afc08 sdyachenko1977/gosh.server:beta2
+docker push sdyachenko1977/gosh.server

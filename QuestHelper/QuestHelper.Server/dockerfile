@@ -1,4 +1,6 @@
 FROM mcr.microsoft.com/dotnet/core/aspnet:2.2
-COPY bin/Release/netcoreapp2.2/publish gosh.server/
+COPY ./publish gosh.server/
+RUN mkdir -p /gosh.server/img
+RUN mkdir -p /gosh.server/img_shared
 WORKDIR /gosh.server
 ENTRYPOINT ["dotnet", "QuestHelper.Server.dll"]

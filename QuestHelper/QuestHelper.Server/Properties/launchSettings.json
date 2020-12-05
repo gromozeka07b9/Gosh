@@ -23,8 +23,6 @@
       "applicationUrl": "http://localhost:31192/",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "GoshDbLogin": "",
-        "GoshDbPassword": "",
         "GoshYandexFolderId": "",
         "GoshYandexApiKey": "",
         "GOSH_IMAGES_PATH": "",
