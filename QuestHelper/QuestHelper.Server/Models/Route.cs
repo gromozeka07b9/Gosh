@@ -28,5 +28,7 @@ namespace QuestHelper.Server.Models
         
         [NotMapped]
         public string CoverImgBase64 { get; set; }
+        [NotMapped]
+        public string PublicReferenceHash { get; set; }
     }
 }

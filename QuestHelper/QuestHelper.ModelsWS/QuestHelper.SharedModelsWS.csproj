@@ -3,6 +3,10 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageVersion>1.1.0</PackageVersion>
+    <Title>Gosh API models</Title>
+    <Authors>Sergey Dyachenko</Authors>
+    <Description>shared models for app</Description>
   </PropertyGroup>
 
 </Project>

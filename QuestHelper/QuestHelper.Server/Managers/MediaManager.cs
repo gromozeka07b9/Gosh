@@ -14,15 +14,6 @@ namespace QuestHelper.Server.Managers
         {
             _pathToMediaCatalog = System.Environment.GetEnvironmentVariable("GOSH_IMAGES_PATH");
             _pathToMediaCatalogShared = System.Environment.GetEnvironmentVariable("GOSH_IMAGES_SHARED_PATH");
-/*#if DEBUG
-            _pathToMediaCatalog = "d:\\diskmail.ru\\gosh\\pics\\pictures";
-            _pathToMediaCatalogShared = "d:\\diskmail.ru\\gosh\\pics\\pictures\\shared";
-            //_pathToMediaCatalog = "c:\\gosh.media\\pictures";
-            //_pathToMediaCatalogShared = "c:\\gosh.media\\pictures\\shared";
-#else
-            _pathToMediaCatalog = "/media/goshmedia";
-            _pathToMediaCatalogShared = "/var/www/www-root/data/wwwroot/wwwroot/shared";            
-#endif*/
         }
 
         public string PathToMediaCatalog

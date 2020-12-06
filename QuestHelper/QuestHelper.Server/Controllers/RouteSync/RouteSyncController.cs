@@ -84,21 +84,24 @@ namespace QuestHelper.Server.Controllers.RouteSync
 
             List<RouteVersion> routeVersions = new List<RouteVersion>();
             AvailableRoutes availRoutes = new AvailableRoutes(_dbOptions);
-            var route = availRoutes.GetByUserIdAndRouteId(userId, routeId);
             List<Models.Route> routes = new List<Models.Route>();
-            routes.Add(route);
-
-            if (string.IsNullOrEmpty(route?.VersionsHash))
+            var route = availRoutes.GetByUserIdAndRouteId(userId, routeId);
+            if (route != null)
             {
-                routeVersions = makeRoutesVersion(routes);
+                routes.Add(route);
+                if (string.IsNullOrEmpty(route?.VersionsHash))
+                {
+                    routeVersions = makeRoutesVersion(routes);
+                }
+                else
+                {
+                    routeVersions = getRoutesVersion(routes);
+                }
             }
-            else
-            {
-                routeVersions = getRoutesVersion(routes);
-            }
+            else Response.StatusCode = 404;
 
             TimeSpan delay = DateTime.Now - startDate;
-            Console.WriteLine($"GetRouteVersion: status 200, {userId}, delay:{delay.TotalMilliseconds}");
+            Console.WriteLine($"GetRouteVersion: status {Response.StatusCode}, {userId}, delay:{delay.TotalMilliseconds}");
 
             return new ObjectResult(routeVersions);
         }

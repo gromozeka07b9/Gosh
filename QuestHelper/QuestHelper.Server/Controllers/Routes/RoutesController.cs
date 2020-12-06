@@ -25,11 +25,7 @@ namespace QuestHelper.Server.Controllers.Routes
         private MediaManager _mediaManager;
         private PoiManager _poiManager;
         private string _pathToMediaCatalog = string.Empty;
-
-        public RoutesController(IConfiguration configuration)
-        {
-            _dbOptions = ServerDbContext.GetOptionsContextDbServer(configuration);
-        }
+        
         public class ShareRequest
         {
             public string RouteIdForShare;
@@ -43,8 +39,9 @@ namespace QuestHelper.Server.Controllers.Routes
             //public string ImgBase64;
             public Dictionary<string, string> ImgDictionary;
         }
-        public RoutesController()
+        public RoutesController(IConfiguration configuration)
         {
+            _dbOptions = ServerDbContext.GetOptionsContextDbServer(configuration);
             _mediaManager = new MediaManager();
             _poiManager = new PoiManager(_dbOptions);
             _pathToMediaCatalog = _mediaManager.PathToMediaCatalog;
