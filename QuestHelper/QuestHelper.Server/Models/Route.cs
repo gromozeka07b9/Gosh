@@ -30,5 +30,10 @@ namespace QuestHelper.Server.Models
         public string CoverImgBase64 { get; set; }
         [NotMapped]
         public string PublicReferenceHash { get; set; }
+        public string CreatorName { get; set; }
+        public int PointCount { get; set; }
+        public int LikeCount { get; set; }
+        public int DislikeCount { get; set; }
+        public int ViewsCount { get; set; }
     }
 }

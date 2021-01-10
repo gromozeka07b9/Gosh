@@ -47,9 +47,9 @@ namespace QuestHelper.Server.Controllers.v2.Public
             {
                 using (var db = new ServerDbContext(_dbOptions))
                 {
-
-                    var sharedRoutes = db.RouteShare.Select(s => s.RouteId).ToList();
-                    var withoutFilter = from route in db.Route where !route.IsDeleted
+                    //ToDo: Убрать дубли маршртутов из-за того, что есть дубли внешних ссылок
+                    //var sharedRoutes = db.RouteShare.Select(s => s.RouteId).ToList().Distinct();
+                    var withoutFilter = from route in db.Route where !route.IsDeleted && route.IsPublished
                         join share in db.RouteShare on route.RouteId equals share.RouteId
                         select new Route { RouteId = route.RouteId, 
                             PublicReferenceHash = share.ReferenceHash,
@@ -63,7 +63,12 @@ namespace QuestHelper.Server.Controllers.v2.Public
                             Name = route.Name,
                             VersionsHash = route.VersionsHash,
                             VersionsList = route.VersionsList,
-                            Version = route.Version
+                            Version = route.Version,
+                            CreatorName = (from users in db.User where users.UserId.Equals(route.CreatorId) select users.Name).FirstOrDefault(),
+                            LikeCount = db.RouteLike.Count(r=>r.RouteId.Equals(route.RouteId) && r.IsLike == 1),
+                            DislikeCount = db.RouteLike.Count(r=>r.RouteId.Equals(route.RouteId) && r.IsLike == 0),
+                            ViewsCount = db.RouteView.Count(r=>r.RouteId.Equals(route.RouteId)),
+                            PointCount = db.RoutePoint.Count(rp=>rp.RouteId.Equals(route.RouteId))
                         };
                     withoutFilter = filters.isFilterPresent("createDate") ? withoutFilter.Where(r => r.CreateDate.Equals(filters.GetDateTimeByName("createDate"))) : withoutFilter;
                     withoutFilter = filters.isFilterPresent("creatorId") ? withoutFilter.Where(r => r.CreatorId.Contains(filters.GetStringByName("creatorId"))) : withoutFilter;
@@ -76,7 +81,7 @@ namespace QuestHelper.Server.Controllers.v2.Public
                     }
 
                     totalCountRows = withoutFilter.Count();
-                    items = withoutFilter.OrderBy(r => r.CreateDate).Skip((pageNumber - 1) * pagingParameters.PageSize).Take(pagingParameters.PageSize).ToList();
+                    items = withoutFilter.OrderByDescending(r => r.CreateDate).Skip((pageNumber - 1) * pagingParameters.PageSize).Take(pagingParameters.PageSize).ToList();
                 }
             }
             HttpContext.Response.Headers.Add("x-total-count", totalCountRows.ToString());
