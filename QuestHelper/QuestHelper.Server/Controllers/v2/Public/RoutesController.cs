@@ -56,11 +56,11 @@ namespace QuestHelper.Server.Controllers.v2.Public
                             CreatorId = route.CreatorId,
                             Description = route.Description,
                             ImgFilename = route.ImgFilename,
-                            FirstImageName = db.RoutePointMediaObject
+                            FirstImageName = string.Concat("img_",db.RoutePointMediaObject
                                 .FirstOrDefault(m => !m.IsDeleted && m.MediaType == MediaObjectTypeEnum.Image && m.ImageLoadedToServer
                                              && m.RoutePointId.Equals(db.RoutePoint
                                     .Where(rp=>rp.RouteId.Equals(route.RouteId))
-                                    .OrderBy(rp=>rp.CreateDate).FirstOrDefault().RoutePointId)).RoutePointMediaObjectId ,
+                                    .OrderBy(rp=>rp.CreateDate).FirstOrDefault().RoutePointId)).RoutePointMediaObjectId, ".jpg") ,
                             IsDeleted = route.IsDeleted,
                             IsPublished = route.IsPublished,
                             IsShared = route.IsShared,
