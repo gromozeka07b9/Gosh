@@ -47,16 +47,20 @@ namespace QuestHelper.Server.Controllers.v2.Public
             {
                 using (var db = new ServerDbContext(_dbOptions))
                 {
-                    //ToDo: Убрать дубли маршртутов из-за того, что есть дубли внешних ссылок
-                    //var sharedRoutes = db.RouteShare.Select(s => s.RouteId).ToList().Distinct();
                     var withoutFilter = from route in db.Route where !route.IsDeleted && route.IsPublished
-                        join share in db.RouteShare on route.RouteId equals share.RouteId
+                        join share in db.RouteShare on new {route.RouteId, user = route.CreatorId} equals new {share.RouteId, user = share.UserId} into shares
+                        from share in shares
                         select new Route { RouteId = route.RouteId, 
                             PublicReferenceHash = share.ReferenceHash,
                             CreateDate = route.CreateDate,
                             CreatorId = route.CreatorId,
                             Description = route.Description,
                             ImgFilename = route.ImgFilename,
+                            FirstImageName = db.RoutePointMediaObject
+                                .FirstOrDefault(m => !m.IsDeleted && m.MediaType == MediaObjectTypeEnum.Image && m.ImageLoadedToServer
+                                             && m.RoutePointId.Equals(db.RoutePoint
+                                    .Where(rp=>rp.RouteId.Equals(route.RouteId))
+                                    .OrderBy(rp=>rp.CreateDate).FirstOrDefault().RoutePointId)).RoutePointMediaObjectId ,
                             IsDeleted = route.IsDeleted,
                             IsPublished = route.IsPublished,
                             IsShared = route.IsShared,
@@ -67,7 +71,7 @@ namespace QuestHelper.Server.Controllers.v2.Public
                             CreatorName = (from users in db.User where users.UserId.Equals(route.CreatorId) select users.Name).FirstOrDefault(),
                             LikeCount = db.RouteLike.Count(r=>r.RouteId.Equals(route.RouteId) && r.IsLike == 1),
                             DislikeCount = db.RouteLike.Count(r=>r.RouteId.Equals(route.RouteId) && r.IsLike == 0),
-                            ViewsCount = db.RouteView.Count(r=>r.RouteId.Equals(route.RouteId)),
+                            ViewCount = db.RouteView.Count(r=>r.RouteId.Equals(route.RouteId)),
                             PointCount = db.RoutePoint.Count(rp=>rp.RouteId.Equals(route.RouteId))
                         };
                     withoutFilter = filters.isFilterPresent("createDate") ? withoutFilter.Where(r => r.CreateDate.Equals(filters.GetDateTimeByName("createDate"))) : withoutFilter;
@@ -88,5 +92,6 @@ namespace QuestHelper.Server.Controllers.v2.Public
             HttpContext.Response.Headers.Add("Access-Control-Expose-Headers", "x-total-count");
             return new ObjectResult(items);
         }
+        
     }
 }
