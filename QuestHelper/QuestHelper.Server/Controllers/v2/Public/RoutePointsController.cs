@@ -41,7 +41,7 @@ namespace QuestHelper.Server.Controllers.v2.Public
                     var publishRoutes = db.Route.Where(r => r.IsPublished && r.IsDeleted == false).Select(r => r.RouteId).ToList();
                     var sharedRoutes = db.RouteShare.Select(s => s.RouteId).ToList();
                     var withoutFilter = db.RoutePoint.Where(x=> x.RouteId.Equals(filters.GetStringByName("routeId")) && sharedRoutes.Contains(x.RouteId) && (publishRoutes.Contains(x.RouteId)) && !x.IsDeleted);
-                    withoutFilter = filters.isFilterPresent("address") ? withoutFilter.Where(r => r.Name.Contains(filters.GetStringByName("address"))) : withoutFilter;
+                    withoutFilter = filters.isFilterPresent("address") ? withoutFilter.Where(r => r.Address.Contains(filters.GetStringByName("address"))) : withoutFilter;
                     withoutFilter = filters.isFilterPresent("name") ? withoutFilter.Where(r => r.Name.Contains(filters.GetStringByName("name"))) : withoutFilter;
                     withoutFilter = filters.isFilterPresent("description") ? withoutFilter.Where(r => r.Description.Contains(filters.GetStringByName("description"))) : withoutFilter;
                     if (filters.isFilterPresent("createDate"))

@@ -1,0 +1,261 @@
+{
+	"info": {
+		"_postman_id": "7cff0459-ae18-461e-9ba4-db5d4550026d",
+		"name": "Gosh.Api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Public",
+			"item": [
+				{
+					"name": "api version",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{hostname}}/api",
+							"protocol": "http",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "routes all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{hostname}}/api/v2/public/routes?pageSize=100&range=%5B0%2C9%5D",
+							"protocol": "http",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"public",
+								"routes"
+							],
+							"query": [
+								{
+									"key": "pageSize",
+									"value": "100"
+								},
+								{
+									"key": "range",
+									"value": "%5B0%2C9%5D"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "routes, filter by name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{hostname}}/api/v2/public/routes?pageSize=100&range=[0,9]&filter={\"name\":\"2019\"}",
+							"protocol": "http",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"public",
+								"routes"
+							],
+							"query": [
+								{
+									"key": "pageSize",
+									"value": "100"
+								},
+								{
+									"key": "range",
+									"value": "[0,9]"
+								},
+								{
+									"key": "filter",
+									"value": "{\"name\":\"2019\"}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "routes, filter by name, description",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{hostname}}/api/v2/public/routes?pageSize=100&range=[0,9]&filter={\"name\":\"2019\",\"description\":\"марш\"}",
+							"protocol": "http",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"public",
+								"routes"
+							],
+							"query": [
+								{
+									"key": "pageSize",
+									"value": "100"
+								},
+								{
+									"key": "range",
+									"value": "[0,9]"
+								},
+								{
+									"key": "filter",
+									"value": "{\"name\":\"2019\",\"description\":\"марш\"}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "routepoints by routeId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{hostname}}/api/v2/public/RoutePoints?pageSize=100&range=[0,9]&filter={\"routeId\":\"cf30e3e1-b9ed-4019-99f3-14c2629e3697\"}",
+							"protocol": "http",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"public",
+								"RoutePoints"
+							],
+							"query": [
+								{
+									"key": "pageSize",
+									"value": "100"
+								},
+								{
+									"key": "range",
+									"value": "[0,9]"
+								},
+								{
+									"key": "filter",
+									"value": "{\"routeId\":\"cf30e3e1-b9ed-4019-99f3-14c2629e3697\"}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "routepoints by routeId, name, description",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{hostname}}/api/v2/public/RoutePoints?pageSize=100&range=[0,9]&filter={\"routeId\":\"cf30e3e1-b9ed-4019-99f3-14c2629e3697\",\"name\":\"толб\",\"description\":\"тол\"}",
+							"protocol": "http",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"public",
+								"RoutePoints"
+							],
+							"query": [
+								{
+									"key": "pageSize",
+									"value": "100"
+								},
+								{
+									"key": "range",
+									"value": "[0,9]"
+								},
+								{
+									"key": "filter",
+									"value": "{\"routeId\":\"cf30e3e1-b9ed-4019-99f3-14c2629e3697\",\"name\":\"толб\",\"description\":\"тол\"}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "routepoints by routeId, address",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{hostname}}/api/v2/public/RoutePoints?pageSize=100&range=[0,9]&filter={\"routeId\":\"c62e28d2-ac6c-474c-aab9-0b99d624456e\",\"address\":\"приморски\"}",
+							"protocol": "http",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"public",
+								"RoutePoints"
+							],
+							"query": [
+								{
+									"key": "pageSize",
+									"value": "100"
+								},
+								{
+									"key": "range",
+									"value": "[0,9]"
+								},
+								{
+									"key": "filter",
+									"value": "{\"routeId\":\"c62e28d2-ac6c-474c-aab9-0b99d624456e\",\"address\":\"приморски\"}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "medias by routePointId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{hostname}}/api/v2/public/RoutePoints/dfabb81c-247c-49f6-86b7-cab69db9b413/medias",
+							"protocol": "http",
+							"host": [
+								"{{hostname}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"public",
+								"RoutePoints",
+								"dfabb81c-247c-49f6-86b7-cab69db9b413",
+								"medias"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
