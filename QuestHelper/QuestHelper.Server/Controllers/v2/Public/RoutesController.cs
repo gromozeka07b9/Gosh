@@ -42,7 +42,7 @@ namespace QuestHelper.Server.Controllers.v2.Public
             FilterParameters filters = new FilterParameters(pagingParameters.Filter);
             int pageNumber = pagingParameters.IndexesRangeToPageNumber(pagingParameters.Range, pagingParameters.PageSize);
             int totalCountRows = 0;
-            List<Route> items = new List<Route>();
+            List<SharedModelsWS.Route> items = new List<SharedModelsWS.Route>();
             if (!string.IsNullOrEmpty(pagingParameters.Range))
             {
                 using (var db = new ServerDbContext(_dbOptions))
@@ -50,7 +50,7 @@ namespace QuestHelper.Server.Controllers.v2.Public
                     var withoutFilter = from route in db.Route where !route.IsDeleted && route.IsPublished
                         join share in db.RouteShare on new {route.RouteId, user = route.CreatorId} equals new {share.RouteId, user = share.UserId} into shares
                         from share in shares
-                        select new Route { RouteId = route.RouteId, 
+                        select new SharedModelsWS.Route { Id = route.RouteId, 
                             PublicReferenceHash = share.ReferenceHash,
                             CreateDate = route.CreateDate,
                             CreatorId = route.CreatorId,
@@ -59,7 +59,7 @@ namespace QuestHelper.Server.Controllers.v2.Public
                             FirstImageName = string.Concat("img_",db.RoutePointMediaObject
                                 .FirstOrDefault(m => !m.IsDeleted && m.MediaType == MediaObjectTypeEnum.Image && m.ImageLoadedToServer
                                              && m.RoutePointId.Equals(db.RoutePoint
-                                    .Where(rp=>rp.RouteId.Equals(route.RouteId))
+                                    .Where(rp=>rp.RouteId.Equals(route.RouteId) && !rp.IsDeleted)
                                     .OrderBy(rp=>rp.CreateDate).FirstOrDefault().RoutePointId)).RoutePointMediaObjectId, ".jpg") ,
                             IsDeleted = route.IsDeleted,
                             IsPublished = route.IsPublished,

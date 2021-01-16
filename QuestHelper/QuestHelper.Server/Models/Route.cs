@@ -28,13 +28,6 @@ namespace QuestHelper.Server.Models
         
         [NotMapped]
         public string CoverImgBase64 { get; set; }
-        [NotMapped]
-        public string PublicReferenceHash { get; set; }
-        public string CreatorName { get; set; }
-        public int PointCount { get; set; }
-        public int LikeCount { get; set; }
-        public int DislikeCount { get; set; }
-        public int ViewCount { get; set; }
-        public string FirstImageName { get; set; }
+
     }
 }

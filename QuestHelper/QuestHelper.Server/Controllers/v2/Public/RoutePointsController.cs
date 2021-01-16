@@ -34,13 +34,17 @@ namespace QuestHelper.Server.Controllers.v2.Public
             int pageNumber = pagingParameters.IndexesRangeToPageNumber(pagingParameters.Range, pagingParameters.PageSize);
             int totalCountRows = 0;
             List<RoutePoint> items = new List<RoutePoint>();
-            if (!string.IsNullOrEmpty(pagingParameters.Range) && filters.isFilterPresent("routeId"))
+            if (!string.IsNullOrEmpty(pagingParameters.Range))
             {
                 using (var db = new ServerDbContext(_dbOptions))
                 {
-                    var publishRoutes = db.Route.Where(r => r.IsPublished && r.IsDeleted == false).Select(r => r.RouteId).ToList();
+                    var publishedRoutes = db.Route.Where(r => r.IsPublished && r.IsDeleted == false).Select(r => r.RouteId).ToList();
                     var sharedRoutes = db.RouteShare.Select(s => s.RouteId).ToList();
-                    var withoutFilter = db.RoutePoint.Where(x=> x.RouteId.Equals(filters.GetStringByName("routeId")) && sharedRoutes.Contains(x.RouteId) && (publishRoutes.Contains(x.RouteId)) && !x.IsDeleted);
+                    var withoutFilter = db.RoutePoint.Where(x=> publishedRoutes.Contains(x.RouteId) && !x.IsDeleted);
+                    withoutFilter = filters.isFilterPresent("routeId")
+                        ? withoutFilter.Where(r=> r.RouteId.Equals(filters.GetStringByName("routeId")) &&
+                                              sharedRoutes.Contains(r.RouteId))
+                        : withoutFilter;
                     withoutFilter = filters.isFilterPresent("address") ? withoutFilter.Where(r => r.Address.Contains(filters.GetStringByName("address"))) : withoutFilter;
                     withoutFilter = filters.isFilterPresent("name") ? withoutFilter.Where(r => r.Name.Contains(filters.GetStringByName("name"))) : withoutFilter;
                     withoutFilter = filters.isFilterPresent("description") ? withoutFilter.Where(r => r.Description.Contains(filters.GetStringByName("description"))) : withoutFilter;
