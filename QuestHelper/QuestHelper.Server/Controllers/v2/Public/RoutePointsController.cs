@@ -2,12 +2,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuestHelper.Server.Managers;
-using QuestHelper.Server.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using QuestHelper.Server.Models;
+using QuestHelper.Server.Models.v2.Public;
+using RoutePoint = QuestHelper.Server.Models.v2.Public.RoutePoint;
 
 namespace QuestHelper.Server.Controllers.v2.Public
 {
@@ -34,6 +36,7 @@ namespace QuestHelper.Server.Controllers.v2.Public
             int pageNumber = pagingParameters.IndexesRangeToPageNumber(pagingParameters.Range, pagingParameters.PageSize);
             int totalCountRows = 0;
             List<RoutePoint> items = new List<RoutePoint>();
+            //RoutePoint[] items = new RoutePoint[]{};
             if (!string.IsNullOrEmpty(pagingParameters.Range))
             {
                 using (var db = new ServerDbContext(_dbOptions))
@@ -55,14 +58,36 @@ namespace QuestHelper.Server.Controllers.v2.Public
                     }
 
                     totalCountRows = withoutFilter.Count();
-                    items = withoutFilter.OrderBy(r => r.CreateDate).Skip((pageNumber - 1) * pagingParameters.PageSize).Take(pagingParameters.PageSize).ToList();
+                    var points = withoutFilter.OrderBy(r => r.CreateDate).Skip((pageNumber - 1) * pagingParameters.PageSize)
+                        .Take(pagingParameters.PageSize).Select(r => new RoutePoint()
+                        {
+                            RouteId = r.RouteId,
+                            RoutePointId = r.RoutePointId,
+                            CreateDate = r.CreateDate,
+                            Name = r.Name,
+                            Version = r.Version,
+                            Description = r.Description,
+                            UpdateDate = r.UpdateDate,
+                            Address = r.Address,
+                            Latitude = r.Latitude,
+                            Longitude = r.Longitude,
+                            IsDeleted = r.IsDeleted,
+                            UpdatedUserId = r.UpdatedUserId
+                            /*Medias = db.RoutePointMediaObject.Where(m => m.RoutePointId.Equals(r.RoutePointId) && !m.IsDeleted).OrderBy(m=>m.RoutePointMediaObjectId).Select(m => new MediaObject()
+                            {
+                                Id = m.RoutePointMediaObjectId,
+                                MediaType = m.MediaType,
+                                Url = (new Uri($"http://igosh.pro/shared/img_{m.RoutePointMediaObjectId}.jpg")).AbsoluteUri,
+                            }).ToArray()*/
+                        }).ToArray();
+                    items = points.OrderBy(r => r.CreateDate).Skip((pageNumber - 1) * pagingParameters.PageSize).Take(pagingParameters.PageSize).ToList();
                 }
             }
             HttpContext.Response.Headers.Add("x-total-count", totalCountRows.ToString());
             HttpContext.Response.Headers.Add("Access-Control-Expose-Headers", "x-total-count");
             return new ObjectResult(items);
         }
-
+        
         /// <summary>
         /// List url public images by route point
         /// </summary>

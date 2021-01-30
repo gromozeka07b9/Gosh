@@ -7,7 +7,7 @@ namespace QuestHelper.Server.Controllers.v2
 {
     public class PagingParameters
     {
-        const int maxPageSize = 50;
+        const int maxPageSize = 200;
         private int _pageNumber = 1;
         private int _pageSize = 3;
         private string _range = string.Empty;
