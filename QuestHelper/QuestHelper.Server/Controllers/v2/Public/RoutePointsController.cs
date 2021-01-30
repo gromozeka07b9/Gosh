@@ -57,7 +57,18 @@ namespace QuestHelper.Server.Controllers.v2.Public
                         withoutFilter = withoutFilter.Where(r => r.CreateDate.Year.Equals(cd.Year) && r.CreateDate.Month.Equals(cd.Month) && r.CreateDate.Day.Equals(cd.Day));
                     }
 
+                    var pointsView = withoutFilter.Select(p => p.RoutePointId);
                     totalCountRows = withoutFilter.Count();
+
+                    var mediasView = db.RoutePointMediaObject
+                        .Where(m => pointsView.Contains(m.RoutePointId) && !m.IsDeleted)
+                        .OrderBy(m => m.RoutePointMediaObjectId).Select(m => new
+                        {
+                            Id = m.RoutePointMediaObjectId,
+                            RoutePointId = m.RoutePointId,
+                            MediaType = m.MediaType,
+                            Url = (new Uri($"http://igosh.pro/shared/img_{m.RoutePointMediaObjectId}.jpg")).AbsoluteUri,
+                        });
                     var points = withoutFilter.OrderBy(r => r.CreateDate).Skip((pageNumber - 1) * pagingParameters.PageSize)
                         .Take(pagingParameters.PageSize).Select(r => new RoutePoint()
                         {
@@ -72,13 +83,13 @@ namespace QuestHelper.Server.Controllers.v2.Public
                             Latitude = r.Latitude,
                             Longitude = r.Longitude,
                             IsDeleted = r.IsDeleted,
-                            UpdatedUserId = r.UpdatedUserId
-                            /*Medias = db.RoutePointMediaObject.Where(m => m.RoutePointId.Equals(r.RoutePointId) && !m.IsDeleted).OrderBy(m=>m.RoutePointMediaObjectId).Select(m => new MediaObject()
+                            UpdatedUserId = r.UpdatedUserId,
+                            Medias = mediasView.Where(m=>m.RoutePointId.Equals(r.RoutePointId)).Select(m => new MediaObject()
                             {
-                                Id = m.RoutePointMediaObjectId,
+                                Id = m.Id,
                                 MediaType = m.MediaType,
-                                Url = (new Uri($"http://igosh.pro/shared/img_{m.RoutePointMediaObjectId}.jpg")).AbsoluteUri,
-                            }).ToArray()*/
+                                Url = (new Uri($"http://igosh.pro/shared/img_{m.Id}.jpg")).AbsoluteUri
+                            }).ToArray()
                         }).ToArray();
                     items = points.OrderBy(r => r.CreateDate).Skip((pageNumber - 1) * pagingParameters.PageSize).Take(pagingParameters.PageSize).ToList();
                 }
