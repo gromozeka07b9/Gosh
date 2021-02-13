@@ -6,8 +6,8 @@
     <Version>1.1.50</Version>
     <Configurations>Debug;Release</Configurations>
     <NeutralLanguage>en</NeutralLanguage>
-    <AssemblyVersion>1.1.54.0</AssemblyVersion>
-    <PackageVersion />
+    <AssemblyVersion>1.1.55.0</AssemblyVersion>
+    <PackageVersion>1.1.55.0</PackageVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -29,6 +29,12 @@
     <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.2" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.2.0" />
+    <PackageReference Include="Serilog" Version="2.10.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
+    <PackageReference Include="Serilog.Sinks.Async" Version="1.4.0" />
+    <PackageReference Include="Serilog.Sinks.ColoredConsole" Version="3.0.1" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.3.1" />
     <PackageReference Include="Xabe.FFmpeg" Version="3.6.2" />
     <PackageReference Include="Microsoft.NET.Sdk.Razor" Version="2.2.0" />

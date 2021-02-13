@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using QuestHelper.Server.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using QuestHelper.Server.Models;
 using QuestHelper.Server.Models.v2.Public;
 using RoutePoint = QuestHelper.Server.Models.v2.Public.RoutePoint;
@@ -20,10 +18,12 @@ namespace QuestHelper.Server.Controllers.v2.Public
     public class RoutePointsController : Controller
     {
         private DbContextOptions<ServerDbContext> _dbOptions;
+        private readonly ILogger<v2.RoutePointsController> _logger;
 
-        public RoutePointsController(IConfiguration configuration)
+        public RoutePointsController(IConfiguration configuration, ILogger<v2.RoutePointsController> logger)
         {
             _dbOptions = ServerDbContext.GetOptionsContextDbServer(configuration);
+            _logger = logger;
         }
         /// <summary>
         /// List all public route points for route

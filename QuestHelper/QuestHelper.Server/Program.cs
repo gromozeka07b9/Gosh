@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using System;
+using Serilog;
+using Serilog.Events;
 
 namespace QuestHelper.Server
 {
@@ -8,13 +10,24 @@ namespace QuestHelper.Server
     {
         public static void Main(string[] args)
         {
+            Log.Logger = new LoggerConfiguration().Enrich.FromLogContext().MinimumLevel.Debug().WriteTo.ColoredConsole(
+                LogEventLevel.Debug,
+                "{NewLine}{Timestamp:HH:mm:ss} [{Level}] ({CorrelationToken}) {Message}{NewLine}{Exception}"
+            ).CreateLogger();
             BuildWebHost(args).Run();
-            Console.WriteLine("QuestHelper server started");
+            Log.Information($"QuestHelper server started ver:{typeof(Startup).Assembly.GetName().Version.ToString()}");
         }
 
+/*        public static IWebHost BuildWebHost(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                .UseStartup<Startup>()
+                .UseSerilog((hostingContext, loggerConfiguration) => loggerConfiguration
+                    .ReadFrom.Configuration(hostingContext.Configuration))
+                .Build();*/
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
+                .UseSerilog()
                 .Build();
     }
 }

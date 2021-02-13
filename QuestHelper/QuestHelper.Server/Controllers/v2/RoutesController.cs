@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace QuestHelper.Server.Controllers.v2
 {
@@ -19,11 +20,13 @@ namespace QuestHelper.Server.Controllers.v2
     [Route("api/v2/[controller]")]
     public class RoutesController : Controller
     {
-        private DbContextOptions<ServerDbContext> _dbOptions;
+        private readonly DbContextOptions<ServerDbContext> _dbOptions;
+        private readonly ILogger<RoutesController> _logger;
 
-        public RoutesController(IConfiguration configuration)
+        public RoutesController(IConfiguration configuration, ILogger<RoutesController> logger)
         {
             _dbOptions = ServerDbContext.GetOptionsContextDbServer(configuration);
+            _logger = logger;
         }
         /// <summary>
         /// List all available routes for user

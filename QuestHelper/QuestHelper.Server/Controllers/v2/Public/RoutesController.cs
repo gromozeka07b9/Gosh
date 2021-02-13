@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using QuestHelper.Server.Managers;
 using QuestHelper.Server.Models;
-//using QuestHelper.SharedModelsWS;
 
 namespace QuestHelper.Server.Controllers.v2.Public
 {
@@ -21,15 +16,17 @@ namespace QuestHelper.Server.Controllers.v2.Public
     public class RoutesController : Controller
     {
 
-        private DbContextOptions<ServerDbContext> _dbOptions;
-        private MediaManager _mediaManager;
-        private string _pathToMediaCatalog;
+        private readonly DbContextOptions<ServerDbContext> _dbOptions;
+        private readonly MediaManager _mediaManager;
+        private readonly string _pathToMediaCatalog;
+        private readonly ILogger<v2.RoutesController> _logger;
 
-        public RoutesController(IConfiguration configuration)
+        public RoutesController(IConfiguration configuration, ILogger<v2.RoutesController> logger)
         {
             _dbOptions = ServerDbContext.GetOptionsContextDbServer(configuration);
             _mediaManager = new MediaManager();
             _pathToMediaCatalog = _mediaManager.PathToMediaCatalog;
+            _logger = logger;
         }
 
         /// <summary>
@@ -76,6 +73,7 @@ namespace QuestHelper.Server.Controllers.v2.Public
                         };
                     withoutFilter = filters.isFilterPresent("createDate") ? withoutFilter.Where(r => r.CreateDate.Equals(filters.GetDateTimeByName("createDate"))) : withoutFilter;
                     withoutFilter = filters.isFilterPresent("creatorId") ? withoutFilter.Where(r => r.CreatorId.Contains(filters.GetStringByName("creatorId"))) : withoutFilter;
+                    withoutFilter = filters.isFilterPresent("id") ? withoutFilter.Where(r => r.Id.Equals(filters.GetStringByName("id"))) : withoutFilter;
                     withoutFilter = filters.isFilterPresent("name") ? withoutFilter.Where(r => r.Name.Contains(filters.GetStringByName("name"))) : withoutFilter;
                     withoutFilter = filters.isFilterPresent("description") ? withoutFilter.Where(r => r.Description.Contains(filters.GetStringByName("description"))) : withoutFilter;
                     if (filters.isFilterPresent("createDate"))
