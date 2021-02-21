@@ -53,11 +53,11 @@ namespace QuestHelper.Server.Controllers.v2.Public
                             CreatorId = route.CreatorId,
                             Description = route.Description,
                             ImgFilename = route.ImgFilename,
-                            FirstImageName = string.Concat("img_",db.RoutePointMediaObject
+                            FirstImageName = getFirstImageFilename(db.RoutePointMediaObject
                                 .FirstOrDefault(m => !m.IsDeleted && m.MediaType == MediaObjectTypeEnum.Image && m.ImageLoadedToServer
                                              && m.RoutePointId.Equals(db.RoutePoint
                                     .Where(rp=>rp.RouteId.Equals(route.RouteId) && !rp.IsDeleted)
-                                    .OrderBy(rp=>rp.CreateDate).FirstOrDefault().RoutePointId)).RoutePointMediaObjectId, ".jpg") ,
+                                    .OrderBy(rp=>rp.CreateDate).FirstOrDefault().RoutePointId)).RoutePointMediaObjectId) ,
                             IsDeleted = route.IsDeleted,
                             IsPublished = route.IsPublished,
                             IsShared = route.IsShared,
@@ -90,6 +90,9 @@ namespace QuestHelper.Server.Controllers.v2.Public
             HttpContext.Response.Headers.Add("Access-Control-Expose-Headers", "x-total-count");
             return new ObjectResult(items);
         }
-        
+        private string getFirstImageFilename(string id)
+        {
+            return string.IsNullOrEmpty(id) ? string.Empty : string.Concat("img_", id, ".jpg");
+        }
     }
 }

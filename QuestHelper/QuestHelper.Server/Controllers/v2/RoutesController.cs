@@ -38,7 +38,7 @@ namespace QuestHelper.Server.Controllers.v2
             FilterParameters filters = new FilterParameters(pagingParameters.Filter);
             int pageNumber = pagingParameters.IndexesRangeToPageNumber(pagingParameters.Range, pagingParameters.PageSize);
             int totalCountRows = 0;
-            List<Route> items = new List<Route>();
+            List<SharedModelsWS.Route> items = new List<SharedModelsWS.Route>();
             if(!string.IsNullOrEmpty(pagingParameters.Range))
             {
                 string userId = IdentityManager.GetUserId(HttpContext);
@@ -61,12 +61,43 @@ namespace QuestHelper.Server.Controllers.v2
                     }
 
                     totalCountRows = withoutFilter.Count();                    
-                    items = withoutFilter.OrderBy(r => r.CreateDate).Skip((pageNumber - 1) * pagingParameters.PageSize).Take(pagingParameters.PageSize).ToList();
+                    var dbRoutes = withoutFilter.OrderBy(r => r.CreateDate).Skip((pageNumber - 1) * pagingParameters.PageSize).Take(pagingParameters.PageSize);
+                    items = dbRoutes.Select(route => new SharedModelsWS.Route()
+                    {
+                        Id = route.RouteId, 
+                        PublicReferenceHash = db.RouteShare.Where(r=>r.RouteId.Equals(route.RouteId)).Select(r=>r.ReferenceHash).FirstOrDefault(),
+                        CreateDate = route.CreateDate,
+                        CreatorId = route.CreatorId,
+                        Description = route.Description,
+                        ImgFilename = route.ImgFilename,
+                        FirstImageName = getFirstImageFilename(db.RoutePointMediaObject
+                            .FirstOrDefault(m => !m.IsDeleted && m.MediaType == MediaObjectTypeEnum.Image && m.ImageLoadedToServer
+                                                 && m.RoutePointId.Equals(db.RoutePoint
+                                                     .Where(rp=>rp.RouteId.Equals(route.RouteId) && !rp.IsDeleted)
+                                                     .OrderBy(rp=>rp.CreateDate).FirstOrDefault().RoutePointId)).RoutePointMediaObjectId),
+                        IsDeleted = route.IsDeleted,
+                        IsPublished = route.IsPublished,
+                        IsShared = route.IsShared,
+                        Name = route.Name,
+                        VersionsHash = route.VersionsHash,
+                        VersionsList = route.VersionsList,
+                        Version = route.Version,
+                        CreatorName = (from users in db.User where users.UserId.Equals(route.CreatorId) select users.Name).FirstOrDefault(),
+                        LikeCount = db.RouteLike.Count(r=>r.RouteId.Equals(route.RouteId) && r.IsLike == 1),
+                        DislikeCount = db.RouteLike.Count(r=>r.RouteId.Equals(route.RouteId) && r.IsLike == 0),
+                        ViewCount = db.RouteView.Count(r=>r.RouteId.Equals(route.RouteId)),
+                        PointCount = db.RoutePoint.Count(rp=>rp.RouteId.Equals(route.RouteId))
+                    }).ToList();
                 }
             }
             HttpContext.Response.Headers.Add("x-total-count", totalCountRows.ToString());
             HttpContext.Response.Headers.Add("Access-Control-Expose-Headers", "x-total-count");
             return new ObjectResult(items);
+        }
+
+        private string getFirstImageFilename(string id)
+        {
+            return string.IsNullOrEmpty(id) ? string.Empty : string.Concat("img_", id, ".jpg");
         }
 
         [HttpGet("{RouteId}")]
