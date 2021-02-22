@@ -12,6 +12,7 @@ namespace QuestHelper.SharedModelsWS
         }
         
         public string Name { get; set; }
+        public DateTimeOffset UpdateDate { get; set; }
         public string CreatorId { get; set; }
         public bool IsShared { get; set; }
         public bool IsPublished { get; set; }
@@ -26,5 +27,7 @@ namespace QuestHelper.SharedModelsWS
         public int DislikeCount { get; set; }
         public int ViewCount { get; set; }
         public string FirstImageName { get; set; }
+        public int DistanceKm { get; set; }
+        public int DistanceSt { get; set; }
     }
 }

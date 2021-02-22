@@ -46,7 +46,9 @@ namespace QuestHelper.Server.Controllers.v2
                 {
                     var routeaccess = db.RouteAccess.Where(u => u.UserId == userId).Select(u => u.RouteId).ToList();
                     var withoutFilter = db.Route.Where(r => routeaccess.Contains(r.RouteId));
-
+                    var test = db.RoutePoint.Where(rp => !rp.IsDeleted && rp.RouteId.Equals("7319f83d-eca0-4501-bf20-8e794039bd70"))
+                        .Max(rp => rp.UpdateDate);
+                    
                     withoutFilter = filters.isFilterPresent("createDate") ? withoutFilter.Where(r => r.CreateDate.Equals(filters.GetDateTimeByName("createDate"))) : withoutFilter;
                     withoutFilter = filters.isFilterPresent("isPublished") ? withoutFilter.Where(r => r.IsPublished == filters.GetBooleanByName("isPublished")) : withoutFilter;
                     withoutFilter = filters.isFilterPresent("isDeleted") ? withoutFilter.Where(r => r.IsDeleted == filters.GetBooleanByName("isDeleted")) : withoutFilter;
@@ -67,6 +69,7 @@ namespace QuestHelper.Server.Controllers.v2
                         Id = route.RouteId, 
                         PublicReferenceHash = db.RouteShare.Where(r=>r.RouteId.Equals(route.RouteId)).Select(r=>r.ReferenceHash).FirstOrDefault(),
                         CreateDate = route.CreateDate,
+                        UpdateDate = db.RoutePoint.Where(rp=>!rp.IsDeleted && rp.RouteId.Equals(route.RouteId)).Select(rp=>rp.UpdateDate).DefaultIfEmpty(route.CreateDate).Max(),
                         CreatorId = route.CreatorId,
                         Description = route.Description,
                         ImgFilename = route.ImgFilename,
@@ -86,7 +89,9 @@ namespace QuestHelper.Server.Controllers.v2
                         LikeCount = db.RouteLike.Count(r=>r.RouteId.Equals(route.RouteId) && r.IsLike == 1),
                         DislikeCount = db.RouteLike.Count(r=>r.RouteId.Equals(route.RouteId) && r.IsLike == 0),
                         ViewCount = db.RouteView.Count(r=>r.RouteId.Equals(route.RouteId)),
-                        PointCount = db.RoutePoint.Count(rp=>rp.RouteId.Equals(route.RouteId))
+                        PointCount = db.RoutePoint.Count(rp=>rp.RouteId.Equals(route.RouteId) && !rp.IsDeleted),
+                        DistanceKm = 0,
+                        DistanceSt = 0
                     }).ToList();
                 }
             }

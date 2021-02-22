@@ -36,7 +36,7 @@ namespace QuestHelper.Server.Controllers.v2
             FilterParameters filters = new FilterParameters(pagingParameters.Filter);
             int pageNumber = pagingParameters.IndexesRangeToPageNumber(pagingParameters.Range, pagingParameters.PageSize);
             int totalCountRows = 0;
-            List<RoutePoint> items = new List<RoutePoint>();
+            List<SharedModelsWS.RoutePoint> items = new List<SharedModelsWS.RoutePoint>();
             if (!string.IsNullOrEmpty(pagingParameters.Range))
             {
                 string userId = IdentityManager.GetUserId(HttpContext);
@@ -58,7 +58,22 @@ namespace QuestHelper.Server.Controllers.v2
                     }
 
                     totalCountRows = withoutFilter.Count();
-                    items = withoutFilter.OrderBy(r => r.CreateDate).Skip((pageNumber - 1) * pagingParameters.PageSize).Take(pagingParameters.PageSize).ToList();
+                    var dbItems = withoutFilter.OrderBy(r => r.CreateDate).Skip((pageNumber - 1) * pagingParameters.PageSize).Take(pagingParameters.PageSize);
+                    items = dbItems.Select(dbRoutePoint => new SharedModelsWS.RoutePoint()
+                    {
+                        Id = dbRoutePoint.RoutePointId,
+                        Name = dbRoutePoint.Name,
+                        Address = dbRoutePoint.Address,
+                        Description = dbRoutePoint.Description,
+                        Latitude = dbRoutePoint.Latitude,
+                        Longitude = dbRoutePoint.Longitude,
+                        Version = dbRoutePoint.Version,
+                        CreateDate = dbRoutePoint.CreateDate,
+                        IsDeleted = dbRoutePoint.IsDeleted,
+                        RouteId = dbRoutePoint.RouteId,
+                        UpdateDate = dbRoutePoint.UpdateDate,
+                        UpdatedUserId = dbRoutePoint.UpdatedUserId
+                    }).ToList();
                 }
             }
             HttpContext.Response.Headers.Add("x-total-count", totalCountRows.ToString());
