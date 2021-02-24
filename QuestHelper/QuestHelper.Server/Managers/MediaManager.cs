@@ -63,5 +63,19 @@ namespace QuestHelper.Server.Managers
             }
             return result;
         }
+
+        public string ConvertMediafileToBase64(string filename)
+        {
+            try
+            {
+                Byte[] imgBytes = System.IO.File.ReadAllBytes(Path.Combine(_pathToMediaCatalog, filename));
+                return Convert.ToBase64String(imgBytes);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            return String.Empty;
+        }
     }
 }

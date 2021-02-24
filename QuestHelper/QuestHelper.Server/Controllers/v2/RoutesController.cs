@@ -5,10 +5,12 @@ using QuestHelper.Server.Managers;
 using QuestHelper.Server.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using QuestHelper.SharedModelsWS;
+using Route = QuestHelper.Server.Models.Route;
 
 namespace QuestHelper.Server.Controllers.v2
 {
@@ -17,16 +19,19 @@ namespace QuestHelper.Server.Controllers.v2
     /// </summary>
     [Authorize]
     [ServiceFilter(typeof(RequestFilter))]
+    [Produces("application/json")]
     [Route("api/v2/[controller]")]
     public class RoutesController : Controller
     {
         private readonly DbContextOptions<ServerDbContext> _dbOptions;
         private readonly ILogger<RoutesController> _logger;
+        private MediaManager _mediaManager;
 
         public RoutesController(IConfiguration configuration, ILogger<RoutesController> logger)
         {
             _dbOptions = ServerDbContext.GetOptionsContextDbServer(configuration);
             _logger = logger;
+            _mediaManager = new MediaManager();
         }
         /// <summary>
         /// List all available routes for user
@@ -46,9 +51,6 @@ namespace QuestHelper.Server.Controllers.v2
                 {
                     var routeaccess = db.RouteAccess.Where(u => u.UserId == userId).Select(u => u.RouteId).ToList();
                     var withoutFilter = db.Route.Where(r => routeaccess.Contains(r.RouteId));
-                    var test = db.RoutePoint.Where(rp => !rp.IsDeleted && rp.RouteId.Equals("7319f83d-eca0-4501-bf20-8e794039bd70"))
-                        .Max(rp => rp.UpdateDate);
-                    
                     withoutFilter = filters.isFilterPresent("createDate") ? withoutFilter.Where(r => r.CreateDate.Equals(filters.GetDateTimeByName("createDate"))) : withoutFilter;
                     withoutFilter = filters.isFilterPresent("isPublished") ? withoutFilter.Where(r => r.IsPublished == filters.GetBooleanByName("isPublished")) : withoutFilter;
                     withoutFilter = filters.isFilterPresent("isDeleted") ? withoutFilter.Where(r => r.IsDeleted == filters.GetBooleanByName("isDeleted")) : withoutFilter;
@@ -64,6 +66,7 @@ namespace QuestHelper.Server.Controllers.v2
 
                     totalCountRows = withoutFilter.Count();                    
                     var dbRoutes = withoutFilter.OrderBy(r => r.CreateDate).Skip((pageNumber - 1) * pagingParameters.PageSize).Take(pagingParameters.PageSize);
+                    
                     items = dbRoutes.Select(route => new SharedModelsWS.Route()
                     {
                         Id = route.RouteId, 
@@ -73,11 +76,6 @@ namespace QuestHelper.Server.Controllers.v2
                         CreatorId = route.CreatorId,
                         Description = route.Description,
                         ImgFilename = route.ImgFilename,
-                        FirstImageName = getFirstImageFilename(db.RoutePointMediaObject
-                            .FirstOrDefault(m => !m.IsDeleted && m.MediaType == MediaObjectTypeEnum.Image && m.ImageLoadedToServer
-                                                 && m.RoutePointId.Equals(db.RoutePoint
-                                                     .Where(rp=>rp.RouteId.Equals(route.RouteId) && !rp.IsDeleted)
-                                                     .OrderBy(rp=>rp.CreateDate).FirstOrDefault().RoutePointId)).RoutePointMediaObjectId),
                         IsDeleted = route.IsDeleted,
                         IsPublished = route.IsPublished,
                         IsShared = route.IsShared,
@@ -100,12 +98,52 @@ namespace QuestHelper.Server.Controllers.v2
             return new ObjectResult(items);
         }
 
-        private string getFirstImageFilename(string id)
+        [HttpGet("covers/list")]
+        [ProducesResponseType(200)]
+        public IActionResult GetRoutesCovers([FromBody]RouteIdArray routes)
         {
-            return string.IsNullOrEmpty(id) ? string.Empty : string.Concat("img_", id, ".jpg");
-        }
+            List<RouteCover> covers = new List<RouteCover>();
+            string userId = IdentityManager.GetUserId(HttpContext);
+            long filesize = 0;
+            using (var db = new ServerDbContext(_dbOptions))
+            {
+                var localRoutes = db.Route.Where(r => routes.IdArray.Contains(r.RouteId) && !r.IsDeleted && !string.IsNullOrEmpty(r.ImgFilename)).Select(r => new {r.RouteId, r.ImgFilename});
+                foreach (var route in localRoutes)
+                {
+                    _logger.LogInformation($"cover getting for routeId:{route.RouteId}");
+                    var cover = new RouteCover()
+                    {
+                        RouteId = route.RouteId, 
+                        ImgCoverFilename = string.IsNullOrEmpty(route.ImgFilename) ? String.Empty : route.ImgFilename 
+                    };
+                    cover.ImgCover = getImageBase64(cover.ImgCoverFilename);
+                    covers.Add(cover);
+                    filesize += cover.ImgCover.Length;
+                }               
+            }
 
-        [HttpGet("{RouteId}")]
+            _logger.LogInformation($"cover getting files uncompressed total size:{filesize}");
+            return new ObjectResult(covers);
+        }
+        private string getImageBase64(string filename)
+        {
+            string base64 = String.Empty;
+            _logger.LogInformation($"cover getting file:{filename}");
+
+            if (_mediaManager.MediaFileExist(filename))
+            {
+                _logger.LogInformation($"cover reading file:{filename}");
+                base64 = _mediaManager.ConvertMediafileToBase64(filename);
+            }
+            else
+            {
+                _logger.LogError($"cover file not found:{filename}");
+            }
+            _logger.LogInformation($"cover file size:{base64.Length}");
+            return base64;
+        }
+        
+        [HttpGet("/{RouteId}")]
         public IActionResult Get(string RouteId)
         {
             Route resultRoute = new Route();
@@ -152,10 +190,6 @@ namespace QuestHelper.Server.Controllers.v2
                     routeObject.VersionsHash = string.Empty;
                     routeObject.VersionsList = string.Empty;
                     db.Entry(entity).CurrentValues.SetValues(routeObject);
-                    /*if (!string.IsNullOrEmpty(routeObject.CoverImgBase64))
-                    {
-                        Base64Manager.SaveBase64ToFile(routeObject.CoverImgBase64, Path.Combine(_pathToMediaCatalog, routeObject.ImgFilename));
-                    }*/
                 }
                 db.SaveChanges();
             }
@@ -163,4 +197,8 @@ namespace QuestHelper.Server.Controllers.v2
 
     }
 
+    public class RouteIdArray
+    {
+        public List<string> IdArray = new List<string>();
     }
+}

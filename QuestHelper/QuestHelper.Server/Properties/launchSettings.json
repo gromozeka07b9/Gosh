@@ -25,8 +25,8 @@
         "ASPNETCORE_ENVIRONMENT": "Development",
         "GoshYandexFolderId": "",
         "GoshYandexApiKey": "",
-        "GOSH_IMAGES_PATH": "",
-        "GOSH_IMAGES_SHARED_PATH": ""
+        "GOSH_IMAGES_PATH": "/Users/sergeydyachenko/goshtest/pictures",
+        "GOSH_IMAGES_SHARED_PATH": "/Users/sergeydyachenko/goshtest/pictures/shared"
       }
     }
   }

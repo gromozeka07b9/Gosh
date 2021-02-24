@@ -56,8 +56,8 @@ namespace QuestHelper.Server.Controllers.v2.Public
                             FirstImageName = getFirstImageFilename(db.RoutePointMediaObject
                                 .FirstOrDefault(m => !m.IsDeleted && m.MediaType == MediaObjectTypeEnum.Image && m.ImageLoadedToServer
                                              && m.RoutePointId.Equals(db.RoutePoint
-                                    .Where(rp=>rp.RouteId.Equals(route.RouteId) && !rp.IsDeleted)
-                                    .OrderBy(rp=>rp.CreateDate).FirstOrDefault().RoutePointId)).RoutePointMediaObjectId) ,
+                                                 .Where(rp=>rp.RouteId.Equals(route.RouteId) && !rp.IsDeleted)
+                                                 .OrderBy(rp=>rp.CreateDate).FirstOrDefault().RoutePointId)).RoutePointMediaObjectId) ,                            
                             IsDeleted = route.IsDeleted,
                             IsPublished = route.IsPublished,
                             IsShared = route.IsShared,

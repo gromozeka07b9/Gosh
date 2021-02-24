@@ -26,7 +26,7 @@ namespace QuestHelper.SharedModelsWS
         public int LikeCount { get; set; }
         public int DislikeCount { get; set; }
         public int ViewCount { get; set; }
-        public string FirstImageName { get; set; }
+        public string FirstImageName { get; set; } //убрать использование, только imgFilename! Но сейчас сайт использует.
         public int DistanceKm { get; set; }
         public int DistanceSt { get; set; }
     }
