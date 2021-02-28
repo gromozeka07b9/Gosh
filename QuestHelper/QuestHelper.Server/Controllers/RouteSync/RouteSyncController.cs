@@ -23,11 +23,13 @@ namespace QuestHelper.Server.Controllers.RouteSync
     {
         private DbContextOptions<ServerDbContext> _dbOptions;
         private RouteManager _routeManager;
+        private RouteHashUpdater _routeHashUpdater;
 
         public RouteSyncController(IConfiguration configuration)
         {
             _dbOptions = ServerDbContext.GetOptionsContextDbServer(configuration);
             _routeManager = new RouteManager(_dbOptions);
+            _routeHashUpdater = new RouteHashUpdater(_dbOptions);
         }
 
         [HttpGet]
@@ -62,7 +64,9 @@ namespace QuestHelper.Server.Controllers.RouteSync
                 routes = availRoutes.GetByUserIdWithPublished(userId);
             }
 
-            List<RouteVersion> routeVersions = makeRoutesVersion(routes);
+            List<RouteVersion> routeVersions = _routeHashUpdater.Calc(routes);
+            
+            //List<RouteVersion> routeVersions = makeRoutesVersion(routes);
 
             TimeSpan delay = DateTime.Now - startDate;
             Console.WriteLine($"GetRouteData full: status 200, {userId}, delay:{delay.TotalMilliseconds}");
@@ -91,7 +95,7 @@ namespace QuestHelper.Server.Controllers.RouteSync
                 routes.Add(route);
                 if (string.IsNullOrEmpty(route?.VersionsHash))
                 {
-                    routeVersions = makeRoutesVersion(routes);
+                    routeVersions = _routeHashUpdater.Calc(routes);
                 }
                 else
                 {
@@ -121,7 +125,7 @@ namespace QuestHelper.Server.Controllers.RouteSync
             return routeVersions;
         }
 
-        private List<RouteVersion> makeRoutesVersion(List<Models.Route> routes)
+        /*private List<RouteVersion> makeRoutesVersion(List<Models.Route> routes)
         {
             List<RouteVersion> routeVersions;
 
@@ -163,7 +167,7 @@ namespace QuestHelper.Server.Controllers.RouteSync
             }
 
             return routeVersions != null ? routeVersions : new List<RouteVersion>();
-        }
+        }*/
 
 
         [HttpGet("{routeid}")]

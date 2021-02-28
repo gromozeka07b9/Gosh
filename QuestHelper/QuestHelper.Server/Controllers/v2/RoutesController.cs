@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using QuestHelper.SharedModelsWS;
@@ -193,6 +194,27 @@ namespace QuestHelper.Server.Controllers.v2
                 }
                 db.SaveChanges();
             }
+        }
+        
+        [HttpPost("{RouteId}/updatehash")]
+        public void Post(string RouteId)
+        {
+            string userId = IdentityManager.GetUserId(HttpContext);
+            var routeHashUpdater = new RouteHashUpdater(_dbOptions);
+            List<RouteVersion> versions = new List<RouteVersion>();
+            using (var db = new ServerDbContext(_dbOptions))
+            {
+                Route entity = db.Route.Find(RouteId);
+                if (entity != null)
+                {
+                    var lstRoute = new List<Route>();
+                    lstRoute.Add(entity);
+                    versions = routeHashUpdater.Calc(lstRoute);
+                }
+            }
+
+            Response.StatusCode = 200;
+            Response.WriteAsync(versions.Count > 0 ? versions.First().ObjVerHash : String.Empty);
         }
 
     }
