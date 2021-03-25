@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "7cff0459-ae18-461e-9ba4-db5d4550026d",
+		"_postman_id": "aa4d94bb-c733-44c2-984e-37ae920b1e6a",
 		"name": "Gosh.Api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -254,6 +254,473 @@
 						}
 					},
 					"response": []
+				}
+			]
+		},
+		{
+			"name": "Private",
+			"item": [
+				{
+					"name": "v1",
+					"item": [
+						{
+							"name": "Sync",
+							"item": [
+								{
+									"name": "Route versions",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{hostname}}/api/route/version/get?onlyPersonal=true",
+											"protocol": "http",
+											"host": [
+												"{{hostname}}"
+											],
+											"path": [
+												"api",
+												"route",
+												"version",
+												"get"
+											],
+											"query": [
+												{
+													"key": "onlyPersonal",
+													"value": "true"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "User",
+							"item": [
+								{
+									"name": "Login",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"Username\": \"gromozeka07b9@gmail.com\",\n  \"Password\": \"\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://{{hostname}}/api/account",
+											"protocol": "http",
+											"host": [
+												"{{hostname}}"
+											],
+											"path": [
+												"api",
+												"account"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get any user",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{hostname}}/api/account/7870ab84-9767-4bda-80b8-2619055b09c4",
+											"protocol": "http",
+											"host": [
+												"{{hostname}}"
+											],
+											"path": [
+												"api",
+												"account",
+												"7870ab84-9767-4bda-80b8-2619055b09c4"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Get route",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{hostname}}/api/route/2354558d-6480-4b9d-a151-bece30f6a8c0",
+									"protocol": "http",
+									"host": [
+										"{{hostname}}"
+									],
+									"path": [
+										"api",
+										"route",
+										"2354558d-6480-4b9d-a151-bece30f6a8c0"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "RoutePointMediaObject metadata",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"RoutePointMediaObjectId\": \"df4be8d6-1234-1234-8f23-e54bad885d52\",\n  \"RoutePointId\": \"df4be8d6-9295-43ea-8f23-e54bad885d52\",\n  \"Version\": 1,\n  \"IsDeleted\": false,\n  \"MediaType\": 0\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{hostname}}/api/RoutePointMediaObjects",
+									"protocol": "http",
+									"host": [
+										"{{hostname}}"
+									],
+									"path": [
+										"api",
+										"RoutePointMediaObjects"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "RoutePointMediaObject upload original",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/Users/sergeydyachenko/temp/гошфото/img_df4be8d6-1234-1234-8f23-e54bad885d52.jpg"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://{{hostname}}/api/RoutePointMediaObjects/df4be8d6-9295-43ea-8f23-e54bad885d52/df4be8d6-1234-1234-8f23-e54bad885d52/uploadfile",
+									"protocol": "http",
+									"host": [
+										"{{hostname}}"
+									],
+									"path": [
+										"api",
+										"RoutePointMediaObjects",
+										"df4be8d6-9295-43ea-8f23-e54bad885d52",
+										"df4be8d6-1234-1234-8f23-e54bad885d52",
+										"uploadfile"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "RoutePointMediaObject upload preview",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/Users/sergeydyachenko/temp/гошфото/img_df4be8d6-1234-1234-8f23-e54bad885d52_preview.jpg"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://{{hostname}}/api/RoutePointMediaObjects/df4be8d6-9295-43ea-8f23-e54bad885d52/df4be8d6-1234-1234-8f23-e54bad885d52/uploadfile",
+									"protocol": "http",
+									"host": [
+										"{{hostname}}"
+									],
+									"path": [
+										"api",
+										"RoutePointMediaObjects",
+										"df4be8d6-9295-43ea-8f23-e54bad885d52",
+										"df4be8d6-1234-1234-8f23-e54bad885d52",
+										"uploadfile"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "RoutePointMediaObject",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{hostname}}/api/RoutePointMediaObjects/df4be8d6-9295-43ea-8f23-e54bad885d52/df4be8d6-1234-1234-8f23-e54bad885d52/img_df4be8d6-1234-1234-8f23-e54bad885d52_preview.jpg",
+									"protocol": "http",
+									"host": [
+										"{{hostname}}"
+									],
+									"path": [
+										"api",
+										"RoutePointMediaObjects",
+										"df4be8d6-9295-43ea-8f23-e54bad885d52",
+										"df4be8d6-1234-1234-8f23-e54bad885d52",
+										"img_df4be8d6-1234-1234-8f23-e54bad885d52_preview.jpg"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "v2",
+					"item": [
+						{
+							"name": "Routes",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{hostname}}/api/v2/Routes?pageSize=100&range=%5B0%2C99%5D",
+									"protocol": "http",
+									"host": [
+										"{{hostname}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"Routes"
+									],
+									"query": [
+										{
+											"key": "pageSize",
+											"value": "100"
+										},
+										{
+											"key": "range",
+											"value": "%5B0%2C99%5D"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Routes",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n        \"name\": \"Test from postman\",\n        \"updateDate\": \"2021-03-26T00:00:00+00:00\",\n        \"creatorId\": \"7870ab84-9767-4bda-80b8-2619055b09c4\",\n        \"isShared\": false,\n        \"isPublished\": false,\n        \"description\": \"test route description\",\n        \"routeId\": \"12341234-1234-4b9d-a151-bece30f6a8c0\",\n        \"createDate\": \"2021-03-26T00:00:00+00:00\",\n        \"version\": 1,\n        \"isDeleted\": false\n    }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{hostname}}/api/v2/Routes/12341234-1234-4b9d-a151-bece30f6a8c0",
+									"protocol": "http",
+									"host": [
+										"{{hostname}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"Routes",
+										"12341234-1234-4b9d-a151-bece30f6a8c0"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Route points",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{hostname}}/api/v2/routepoints?pageSize=100&range=%5B0%2C99%5D&filter={\"routeId\":\"12341234-1234-4b9d-a151-bece30f6a8c0\"}",
+									"protocol": "http",
+									"host": [
+										"{{hostname}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"routepoints"
+									],
+									"query": [
+										{
+											"key": "pageSize",
+											"value": "100"
+										},
+										{
+											"key": "range",
+											"value": "%5B0%2C99%5D"
+										},
+										{
+											"key": "filter",
+											"value": "{\"routeId\":\"12341234-1234-4b9d-a151-bece30f6a8c0\"}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Route point",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "    {\n        \"routeId\": \"12341234-1234-4b9d-a151-bece30f6a8c0\",\n        \"name\": \"test route point 1\",\n        \"updateDate\": \"2021-03-26T00:00:00+00:00\",\n        \"updatedUserId\": \"\",\n        \"latitude\": 55.76887,\n        \"longitude\": 37.6203302,\n        \"address\": \"3/27, Цветной бульвар, Москва, Россия\",\n        \"description\": \"test description\",\n        \"id\": \"c1d97cb6-1234-1234-821c-32debbdbfc5a\",\n        \"createDate\": \"2021-03-26T00:00:00+00:00\",\n        \"version\": 1,\n        \"isDeleted\": false\n    }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{hostname}}/api/v2/routepoints",
+									"protocol": "http",
+									"host": [
+										"{{hostname}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"routepoints"
+									]
+								}
+							},
+							"response": []
+						}
+					]
 				}
 			]
 		}
