@@ -135,5 +135,7 @@ GET http://{{hostname}}/api/RoutePointMediaObjects/df4be8d6-9295-43ea-8f23-e54ba
 
 
 # ВСЕ GUID в примерах вымышлены, НЕ НУЖНО их использовать, генерируйте свои!
+<br>
 Буду рад ответить на вопросы, пишите в канал Telegram https://t.me/goshapp или в личку https://t.me/Sergey_Dyachenko
+<br>
 I will glad to see your questions in Telegram https://t.me/goshapp or in private https://t.me/Sergey_Dyachenko
