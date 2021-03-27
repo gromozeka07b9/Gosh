@@ -55,6 +55,7 @@ Body:
 Все примеры находятся в проекте Postman.
 
 **Пример получения публичных маршрутов (Route all в Postman)**
+<br>
 GET http://{{hostname}}/api/v2/public/routes?pageSize=100&range=[0,9]&filter={"name":"2019"}
 В качестве параметров передаем:
 * pageSize - размер порции данных
