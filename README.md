@@ -132,3 +132,8 @@ GET http://{{hostname}}/api/RoutePointMediaObjects/df4be8d6-9295-43ea-8f23-e54ba
 Первый параметр (df4be8d6-9295-43ea-8f23-e54bad885d52) - Id точки маршрута
 Второй параметр (df4be8d6-1234-1234-8f23-e54bad885d52) - Id media
 Третий параметр - имя файла для скачивания. Правила формирования имени выше описаны.
+
+
+# ВСЕ GUID в примерах вымышлены, НЕ НУЖНО их использовать, генерируйте свои!
+Буду рад ответить на вопросы, пишите в канал Telegram https://t.me/goshapp или в личку https://t.me/Sergey_Dyachenko
+I will glad to see your questions in Telegram https://t.me/goshapp or in private https://t.me/Sergey_Dyachenko
