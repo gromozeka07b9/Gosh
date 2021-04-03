@@ -246,7 +246,14 @@ namespace QuestHelper.Server.Controllers.v2
                         Latitude = p.Latitude,
                         Longitude = p.Longitude,
                         DateTimeBegin = p.DateTimeBegin,
-                        DateTimeEnd = p.DateTimeEnd
+                        DateTimeEnd = p.DateTimeEnd,
+                        Geopoints = db.RouteTrackGeopoint.Where(g=>g.RouteTrackPlaceId.Equals(p.Id)).Select(g=>new RouteTracking.RouteTrackingPlace.RouteTrackGeopoint()
+                        {
+                            DateTimePin = g.DateTimePin,
+                            Elevation = g.Elevation,
+                            Latitude = g.Latitude,
+                            Longitude = g.Longitude
+                        }).OrderBy(g=>g.DateTimePin).ToArray()
                     }).OrderBy(p=>p.DateTimeBegin).ToArray()
                 }).ToList();
             }

@@ -8,9 +8,9 @@ namespace QuestHelper.Server.Models
         [Key]
         [MaxLength(16)]
         public byte[] Id { get; set; }
-        public string RouteTrackPlaceId { get; set; }
+        public byte[] RouteTrackPlaceId { get; set; }
 
-        public DateTime TimePoint { get; set; }        
+        public DateTime DateTimePin { get; set; }        
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
         public double? Elevation { get; set; }

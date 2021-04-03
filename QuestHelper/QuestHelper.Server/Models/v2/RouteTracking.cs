@@ -27,6 +27,15 @@ namespace QuestHelper.Server.Models.v2
             public DateTime DateTimeEnd { get; set; }        
             public double? Latitude { get; set; }
             public double? Longitude { get; set; }
+            public RouteTrackGeopoint[] Geopoints { get; set; }
+            
+            public class RouteTrackGeopoint
+            {
+                public DateTime DateTimePin { get; set; }        
+                public double? Latitude { get; set; }
+                public double? Longitude { get; set; }
+                public double? Elevation { get; set; }
+            }
         }
     }
 }
