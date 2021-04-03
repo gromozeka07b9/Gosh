@@ -7,13 +7,19 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+using System.Xml.Serialization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
+using Pomelo.EntityFrameworkCore.MySql.Query.ExpressionTranslators.Internal;
 using QuestHelper.Server.Models.v2;
 using QuestHelper.SharedModelsWS;
 using Route = QuestHelper.Server.Models.Route;
+using QuestHelper.Server.Models.Tracks;
+using QuestHelper.Server.Models.Tracks.KML22;
 
 namespace QuestHelper.Server.Controllers.v2
 {
@@ -239,21 +245,14 @@ namespace QuestHelper.Server.Controllers.v2
                     Places = db.RouteTrackPlace.Where(p=>p.RouteTrackId.Equals(r.Id)).Select(p=>new RouteTracking.RouteTrackingPlace()
                     {
                         Name = p.Name,
-                        Description = p.Description,
-                        Address = p.Address,
-                        Category = p.Category,
-                        Distance = p.Distance,
+                        //Description = p.Description,
+                        //Address = p.Address,
+                        //Category = p.Category,
+                        //Distance = p.Distance,
                         Latitude = p.Latitude,
                         Longitude = p.Longitude,
                         DateTimeBegin = p.DateTimeBegin,
                         DateTimeEnd = p.DateTimeEnd,
-                        Geopoints = db.RouteTrackGeopoint.Where(g=>g.RouteTrackPlaceId.Equals(p.Id)).Select(g=>new RouteTracking.RouteTrackingPlace.RouteTrackGeopoint()
-                        {
-                            DateTimePin = g.DateTimePin,
-                            Elevation = g.Elevation,
-                            Latitude = g.Latitude,
-                            Longitude = g.Longitude
-                        }).OrderBy(g=>g.DateTimePin).ToArray()
                     }).OrderBy(p=>p.DateTimeBegin).ToArray()
                 }).ToList();
             }
@@ -262,6 +261,220 @@ namespace QuestHelper.Server.Controllers.v2
             return new ObjectResult(tracks);
         }
         
+        [HttpPost("{RouteId}/tracks")]
+        public async Task PostNewTrack(string routeId, IFormFile file)
+        {
+            string userId = IdentityManager.GetUserId(HttpContext);
+            if ((file.Length > 0) && (!string.IsNullOrEmpty(file.FileName)))
+            {
+                string tempFileName = Path.GetTempFileName();
+                using (var stream = new FileStream(tempFileName, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                if (file.FileName.EndsWith(".kml", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    if (!saveKml21ToDbAsTrack(tempFileName, routeId))
+                    {
+                        saveKml22ToDbAsTrack(tempFileName, routeId);
+                    }
+                } else if (file.FileName.EndsWith(".gpx", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    saveGpxToDbAsTrack(tempFileName, routeId);
+                }
+                else
+                {
+                    Response.StatusCode = StatusCodes.Status400BadRequest;
+                }
+            }
+            else
+            {
+                Response.StatusCode = StatusCodes.Status400BadRequest;
+            }
+            Response.StatusCode = 200;
+        }
+
+        private bool saveKml21ToDbAsTrack(string pathToFile, string routeId)
+        {
+            //создание модели на основе xml
+            //https://xmltocsharp.azurewebsites.net/
+            using (var fileStream = System.IO.File.Open(pathToFile, FileMode.Open))
+            {
+                var serializer = new XmlSerializer(typeof(Kml21CustomScheme));
+                Kml21CustomScheme kmlObject = new Kml21CustomScheme();
+                try
+                {
+                    kmlObject = (Kml21CustomScheme) serializer.Deserialize(fileStream);
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
+                if (kmlObject.Folder != null)
+                {
+                    using (var db = new ServerDbContext(_dbOptions))
+                    {
+                        RouteTrack dbRouteTrack = new RouteTrack();
+                        dbRouteTrack.Id = Guid.NewGuid().ToByteArray();
+                        dbRouteTrack.RouteId = routeId;
+                        dbRouteTrack.CreateDate = DateTime.Now;
+                        dbRouteTrack.Version = 1;
+                        dbRouteTrack.Name = kmlObject.Folder.Name;
+                        dbRouteTrack.Description = !string.IsNullOrEmpty(kmlObject.Folder.Description)?kmlObject.Folder.Description.Substring(0, kmlObject.Folder.Description.Length):string.Empty;
+                        foreach (var folderInside in kmlObject.Folder.FolderInside)
+                        {
+                            foreach (var placemark in folderInside.Placemark)
+                            {
+                                RouteTrackPlace dbRoutePlace = new RouteTrackPlace();
+                                dbRoutePlace.Id = Guid.NewGuid().ToByteArray();
+                                dbRoutePlace.RouteTrackId = dbRouteTrack.Id;
+                                dbRoutePlace.Name = placemark.Name;
+                                dbRoutePlace.Description = !string.IsNullOrEmpty(placemark.Description)?placemark.Description.Substring(0, placemark.Description.Length):string.Empty;
+                                if (placemark.TimeSpanKml != null)
+                                {
+                                    dbRoutePlace.DateTimeBegin = placemark.TimeSpanKml != null ? DateTime.Parse(placemark.TimeSpanKml.Begin) : DateTime.MinValue;
+                                    dbRoutePlace.DateTimeEnd = placemark.TimeSpanKml != null ? DateTime.Parse(placemark.TimeSpanKml.End) : DateTime.MinValue;
+                                    var pointCoords = placemark.Point?.Coordinates?.Split(",");
+                                    //37.40418431349098682403564453125,55.81698308698832988739013671875, 277
+                                    //37.397304866462946, 55.81914712674916
+                                    if (pointCoords.Length >= 2)
+                                    {
+                                        dbRoutePlace.Latitude = Convert.ToDouble(pointCoords[1]);
+                                        dbRoutePlace.Longitude = Convert.ToDouble(pointCoords[0]);
+                                        dbRoutePlace.Elevation = pointCoords.Length > 2 ? Convert.ToDouble(pointCoords[2]) : 0;
+                                    }
+                                    db.RouteTrackPlace.Add(dbRoutePlace);
+                                }
+                            }
+                        }
+                        db.RouteTrack.Add(dbRouteTrack);
+                        db.SaveChanges();
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+        private bool saveKml22ToDbAsTrack(string pathToFile, string routeId)
+        {
+            //создание модели на основе xml
+            //https://xmltocsharp.azurewebsites.net/
+            using (var fileStream = System.IO.File.Open(pathToFile, FileMode.Open))
+            {
+                var serializer = new XmlSerializer(typeof(Kml22CustomScheme));
+                Kml22CustomScheme kmlObject = new Kml22CustomScheme();
+                try
+                {
+                    kmlObject = (Kml22CustomScheme) serializer.Deserialize(fileStream);
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
+                if (kmlObject.Document != null)
+                {
+                    using (var db = new ServerDbContext(_dbOptions))
+                    {
+                        RouteTrack dbRouteTrack = new RouteTrack();
+                        dbRouteTrack.Id = Guid.NewGuid().ToByteArray();
+                        dbRouteTrack.RouteId = routeId;
+                        dbRouteTrack.CreateDate = DateTime.Now;
+                        dbRouteTrack.Version = 1;
+                        dbRouteTrack.Name = kmlObject.Document.Name;
+                        dbRouteTrack.Description = !string.IsNullOrEmpty(kmlObject.Document.Description)?kmlObject.Document.Description.Substring(0, kmlObject.Document.Description.Length):string.Empty;
+                        foreach (var folderInside in kmlObject.Document.Folder)
+                        {
+                            foreach (var placemark in folderInside.Placemark)
+                            {
+                                RouteTrackPlace dbRoutePlace = new RouteTrackPlace();
+                                dbRoutePlace.Id = Guid.NewGuid().ToByteArray();
+                                dbRoutePlace.RouteTrackId = dbRouteTrack.Id;
+                                dbRoutePlace.Name = placemark.Name;
+                                dbRoutePlace.Description = !string.IsNullOrEmpty(placemark.Description)?placemark.Description.Substring(0, placemark.Description.Length):string.Empty;
+                                if (placemark.LookAt != null)
+                                {
+                                    dbRoutePlace.Latitude = Convert.ToDouble(placemark.LookAt.Latitude);
+                                    dbRoutePlace.Longitude = Convert.ToDouble(placemark.LookAt.Longitude);
+                                    dbRoutePlace.Elevation = Convert.ToDouble(placemark.LookAt.Altitude);
+                                }
+                                db.RouteTrackPlace.Add(dbRoutePlace);
+                            }
+                        }
+                        foreach (var placemark in kmlObject.Document.Placemark)
+                        {
+                            RouteTrackPlace dbRoutePlace = new RouteTrackPlace();
+                            dbRoutePlace.Id = Guid.NewGuid().ToByteArray();
+                            dbRoutePlace.RouteTrackId = dbRouteTrack.Id;
+                            dbRoutePlace.Name = placemark.Name;
+                            dbRoutePlace.Description = !string.IsNullOrEmpty(placemark.Description)?placemark.Description.Substring(0, placemark.Description.Length):string.Empty;
+                            if (placemark.LookAt != null)
+                            {
+                                dbRoutePlace.Latitude = Convert.ToDouble(placemark.LookAt.Latitude);
+                                dbRoutePlace.Longitude = Convert.ToDouble(placemark.LookAt.Longitude);
+                                dbRoutePlace.Elevation = Convert.ToDouble(placemark.LookAt.Altitude);
+                            }
+
+                            dbRoutePlace.DateTimeBegin = DateTime.Parse(placemark.TimeSpanKml.Begin);
+                            dbRoutePlace.DateTimeEnd = DateTime.Parse(placemark.TimeSpanKml.End);
+                            db.RouteTrackPlace.Add(dbRoutePlace);
+                        }
+                        db.RouteTrack.Add(dbRouteTrack);
+                        db.SaveChanges();
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+        private void saveGpxToDbAsTrack(string pathToFile, string routeId)
+        {
+            //создание модели на основе xml
+            //https://xmltocsharp.azurewebsites.net/
+            using (var fileStream = System.IO.File.Open(pathToFile, FileMode.Open))
+            {
+                var serializer = new XmlSerializer(typeof(GPXCustomScheme));
+                var trackObject = (GPXCustomScheme) serializer.Deserialize(fileStream);
+                if (trackObject.Trk != null)
+                {
+                    using (var db = new ServerDbContext(_dbOptions))
+                    {
+                        RouteTrack dbRouteTrack = new RouteTrack
+                        {
+                            Id = Guid.NewGuid().ToByteArray(),
+                            RouteId = routeId,
+                            CreateDate = DateTime.Now,
+                            Version = 1,
+                            Name = trackObject.Trk.Name,
+                            Description = !string.IsNullOrEmpty(trackObject.Trk.Type)
+                                ? trackObject.Trk.Type.Substring(0, trackObject.Trk.Type.Length)
+                                : string.Empty
+                        };
+                        foreach (var segments in trackObject.Trk.Trkseg)
+                        {
+                            foreach (var placemark in segments.Trkpt)
+                            {
+                                RouteTrackPlace dbRoutePlace = new RouteTrackPlace();
+                                dbRoutePlace.Id = Guid.NewGuid().ToByteArray();
+                                dbRoutePlace.RouteTrackId = dbRouteTrack.Id;
+                                if (placemark.Time != null)
+                                {
+                                    dbRoutePlace.DateTimeBegin = DateTime.Parse(placemark.Time);
+                                    dbRoutePlace.Latitude = Convert.ToDouble(placemark.Lat);
+                                    dbRoutePlace.Longitude = Convert.ToDouble(placemark.Lon);
+                                    dbRoutePlace.Elevation = Convert.ToDouble(placemark.Ele);
+                                    db.RouteTrackPlace.Add(dbRoutePlace);
+                                }
+                            }
+                        }
+                        db.RouteTrack.Add(dbRouteTrack);
+                        db.SaveChanges();
+                    }
+                }
+            }
+        }
     }
 
     public class RouteIdArray
