@@ -10,6 +10,8 @@ using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
+using QuestHelper.Server.Models.v2;
 using QuestHelper.SharedModelsWS;
 using Route = QuestHelper.Server.Models.Route;
 
@@ -217,6 +219,42 @@ namespace QuestHelper.Server.Controllers.v2
             Response.WriteAsync(versions.Count > 0 ? versions.First().ObjVerHash : String.Empty);
         }
 
+        [HttpGet("{RouteId}/tracks")]
+        [ProducesResponseType(200)]
+        public IActionResult GetRoutesTracks(string RouteId)
+        {
+            List<RouteTracking> tracks = new List<RouteTracking>();
+            string userId = IdentityManager.GetUserId(HttpContext);
+            using (var db = new ServerDbContext(_dbOptions))
+            {
+                tracks = db.RouteTrack.Where(r => r.RouteId.Equals(RouteId) && !r.IsDeleted).Select(r => new RouteTracking()
+                {
+                    Id = "0x" + BitConverter.ToString(r.Id).Replace("-",""),
+                    Name = r.Name,
+                    Description = r.Description,
+                    Version = r.Version,
+                    CreateDate = r.CreateDate,
+                    IsDeleted = r.IsDeleted,
+                    RouteId = r.RouteId,
+                    Places = db.RouteTrackPlace.Where(p=>p.RouteTrackId.Equals(r.Id)).Select(p=>new RouteTracking.RouteTrackingPlace()
+                    {
+                        Name = p.Name,
+                        Description = p.Description,
+                        Address = p.Address,
+                        Category = p.Category,
+                        Distance = p.Distance,
+                        Latitude = p.Latitude,
+                        Longitude = p.Longitude,
+                        DateTimeBegin = p.DateTimeBegin,
+                        DateTimeEnd = p.DateTimeEnd
+                    }).OrderBy(p=>p.DateTimeBegin).ToArray()
+                }).ToList();
+            }
+
+            _logger.LogInformation($"GetRoutesTracks");
+            return new ObjectResult(tracks);
+        }
+        
     }
 
     public class RouteIdArray

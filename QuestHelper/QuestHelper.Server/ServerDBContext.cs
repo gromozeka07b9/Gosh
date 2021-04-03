@@ -31,6 +31,8 @@ namespace QuestHelper.Server
         public DbSet<RouteView> RouteView { get; set; }
         public DbSet<User> User { get; set; }
         public DbSet<OauthUser> OauthUser { get; set; }
+        public DbSet<RouteTrack> RouteTrack { get; set; }
+        public DbSet<RouteTrackPlace> RouteTrackPlace { get; set; }
 
         public static DbContextOptions<ServerDbContext> GetOptionsContextDbServer(IConfiguration configuration, bool isFake = false)
         {
