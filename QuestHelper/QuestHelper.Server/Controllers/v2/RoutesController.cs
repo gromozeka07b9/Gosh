@@ -20,6 +20,7 @@ using QuestHelper.SharedModelsWS;
 using Route = QuestHelper.Server.Models.Route;
 using QuestHelper.Server.Models.Tracks;
 using QuestHelper.Server.Models.Tracks.KML22;
+using Placemark = QuestHelper.Server.Models.Tracks.KML22.Placemark;
 
 namespace QuestHelper.Server.Controllers.v2
 {
@@ -388,37 +389,79 @@ namespace QuestHelper.Server.Controllers.v2
                         {
                             foreach (var placemark in folderInside.Placemark)
                             {
-                                RouteTrackPlace dbRoutePlace = new RouteTrackPlace();
-                                dbRoutePlace.Id = Guid.NewGuid().ToByteArray();
-                                dbRoutePlace.RouteTrackId = dbRouteTrack.Id;
-                                dbRoutePlace.Name = placemark.Name;
-                                dbRoutePlace.Description = !string.IsNullOrEmpty(placemark.Description)?placemark.Description.Substring(0, placemark.Description.Length):string.Empty;
                                 if (placemark.LookAt != null)
                                 {
-                                    dbRoutePlace.Latitude = Convert.ToDouble(placemark.LookAt.Latitude);
-                                    dbRoutePlace.Longitude = Convert.ToDouble(placemark.LookAt.Longitude);
-                                    dbRoutePlace.Elevation = Convert.ToDouble(placemark.LookAt.Altitude);
+                                    var dbRoutePlace = makeNewTrackPlace(dbRouteTrack.Id,
+                                        placemark.Name,
+                                        !string.IsNullOrEmpty(placemark.Description)
+                                            ? placemark.Description.Substring(0, placemark.Description.Length)
+                                            : string.Empty,
+                                        DateTime.Parse(placemark.TimeSpanKml.Begin),
+                                        DateTime.Parse(placemark.TimeSpanKml.End),
+                                        ConvertStringToDoubleGeo(placemark.LookAt.Latitude),
+                                        ConvertStringToDoubleGeo(placemark.LookAt.Longitude),
+                                        ConvertStringToDoubleGeo(placemark.LookAt.Altitude)
+                                    );
+                                    db.RouteTrackPlace.Add(dbRoutePlace);
                                 }
-                                db.RouteTrackPlace.Add(dbRoutePlace);
                             }
                         }
                         foreach (var placemark in kmlObject.Document.Placemark)
                         {
-                            RouteTrackPlace dbRoutePlace = new RouteTrackPlace();
-                            dbRoutePlace.Id = Guid.NewGuid().ToByteArray();
-                            dbRoutePlace.RouteTrackId = dbRouteTrack.Id;
-                            dbRoutePlace.Name = placemark.Name;
-                            dbRoutePlace.Description = !string.IsNullOrEmpty(placemark.Description)?placemark.Description.Substring(0, placemark.Description.Length):string.Empty;
                             if (placemark.LookAt != null)
                             {
-                                dbRoutePlace.Latitude = Convert.ToDouble(placemark.LookAt.Latitude);
-                                dbRoutePlace.Longitude = Convert.ToDouble(placemark.LookAt.Longitude);
-                                dbRoutePlace.Elevation = Convert.ToDouble(placemark.LookAt.Altitude);
+                                var dbRoutePlace = makeNewTrackPlace(dbRouteTrack.Id,
+                                    placemark.Name,
+                                    !string.IsNullOrEmpty(placemark.Description)
+                                        ? placemark.Description.Substring(0, placemark.Description.Length)
+                                        : string.Empty,
+                                    DateTime.Parse(placemark.TimeSpanKml.Begin),
+                                    DateTime.Parse(placemark.TimeSpanKml.End),
+                                    ConvertStringToDoubleGeo(placemark.LookAt.Latitude),
+                                    ConvertStringToDoubleGeo(placemark.LookAt.Longitude),
+                                    ConvertStringToDoubleGeo(placemark.LookAt.Altitude)
+                                );
+                                db.RouteTrackPlace.Add(dbRoutePlace);
+                            } else if (placemark.Point?.Coordinates != null)
+                            {
+                                var coordsArray = parseCoordinatesToList(placemark.Point.Coordinates);
+                                if (coordsArray.Count > 0)
+                                {
+                                    var dbRoutePlace = makeNewTrackPlace(dbRouteTrack.Id,
+                                        placemark.Name,
+                                        !string.IsNullOrEmpty(placemark.Description)
+                                            ? placemark.Description.Substring(0, placemark.Description.Length)
+                                            : string.Empty,
+                                        DateTime.Parse(placemark.TimeSpanKml.Begin),
+                                        DateTime.Parse(placemark.TimeSpanKml.End),
+                                        ConvertStringToDoubleGeo(coordsArray[0][0]),
+                                        ConvertStringToDoubleGeo(coordsArray[0][1]),
+                                        (coordsArray[0].Length > 2) ? ConvertStringToDoubleGeo(coordsArray[0][2]) : 0.0
+                                    );
+                                    db.RouteTrackPlace.Add(dbRoutePlace);
+                                }
+                            } else if (placemark.LineString?.Coordinates != null)
+                            {
+                                var coordsArray = parseCoordinatesToList(placemark.LineString.Coordinates);
+                                if (coordsArray.Count > 0)
+                                {
+                                    foreach (var geopoint in coordsArray.Where(s=>s.Length > 1))
+                                    {
+                                        var dbRoutePlace = makeNewTrackPlace(dbRouteTrack.Id,
+                                            placemark.Name,
+                                            !string.IsNullOrEmpty(placemark.Description)
+                                                ? placemark.Description.Substring(0, placemark.Description.Length)
+                                                : string.Empty,
+                                            DateTime.Parse(placemark.TimeSpanKml.Begin),
+                                            DateTime.Parse(placemark.TimeSpanKml.End),
+                                            ConvertStringToDoubleGeo(geopoint[0]),
+                                            ConvertStringToDoubleGeo(geopoint[1]),
+                                            (geopoint.Length > 2) ? ConvertStringToDoubleGeo(geopoint[2]) : 0.0
+                                        );
+                                        db.RouteTrackPlace.Add(dbRoutePlace);
+                                    }
+                                }
                             }
-
-                            dbRoutePlace.DateTimeBegin = DateTime.Parse(placemark.TimeSpanKml.Begin);
-                            dbRoutePlace.DateTimeEnd = DateTime.Parse(placemark.TimeSpanKml.End);
-                            db.RouteTrackPlace.Add(dbRoutePlace);
                         }
                         db.RouteTrack.Add(dbRouteTrack);
                         db.SaveChanges();
@@ -429,6 +472,54 @@ namespace QuestHelper.Server.Controllers.v2
 
             return false;
         }
+
+        private RouteTrackPlace makeNewTrackPlace(byte[] routeTrackid, string placemarkName, string description, DateTime dateTimeBegin, DateTime dateTimeEnd, double latitude, double longitude, double altitude)
+        {
+            RouteTrackPlace dbRoutePlace = new RouteTrackPlace();
+            dbRoutePlace.Id = Guid.NewGuid().ToByteArray();
+            dbRoutePlace.RouteTrackId = routeTrackid;
+            dbRoutePlace.Name = placemarkName;
+            dbRoutePlace.Description = description;
+            dbRoutePlace.DateTimeBegin = dateTimeBegin;
+            dbRoutePlace.DateTimeEnd = dateTimeEnd;
+            dbRoutePlace.Latitude = latitude;
+            dbRoutePlace.Longitude = longitude;
+            dbRoutePlace.Elevation = altitude;
+            return dbRoutePlace;
+        }
+
+        private static double ConvertStringToDoubleGeo(string geoCoordinateValue)
+        {
+            double result = 0.0;
+            if (!string.IsNullOrEmpty(geoCoordinateValue))
+            {
+                try
+                {
+                    result = Convert.ToDouble(geoCoordinateValue.Replace("−","-"));
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return result;
+        }
+
+        private List<string[]> parseCoordinatesToList(string pointCoordinates)
+        {
+            List<string[]> geopoints = new List<string[]>();
+            if (!string.IsNullOrEmpty(pointCoordinates))
+            {
+                var geopointsCoordinates = pointCoordinates.Split(" ");
+                foreach (var geopoint in geopointsCoordinates)
+                {
+                    geopoints.Add(geopoint.Split(","));
+                }
+            }
+
+            return geopoints;
+        }
+
         private void saveGpxToDbAsTrack(string pathToFile, string routeId)
         {
             //создание модели на основе xml
