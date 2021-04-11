@@ -231,11 +231,11 @@ namespace QuestHelper.Server.Controllers.v2
         [ProducesResponseType(200)]
         public JsonResult GetRoutesTracks(string RouteId)
         {
-            List<RouteTracking> tracks = new List<RouteTracking>();
+            RouteTracking track = new RouteTracking();
             string userId = IdentityManager.GetUserId(HttpContext);
             using (var db = new ServerDbContext(_dbOptions))
             {
-                tracks = db.RouteTrack.Where(r => r.RouteId.Equals(RouteId) && !r.IsDeleted).Select(r => new RouteTracking()
+                track = db.RouteTrack.Where(r => r.RouteId.Equals(RouteId) && !r.IsDeleted).Select(r => new RouteTracking()
                 {
                     Id = BitConverter.ToString(r.Id).Replace("-",""),
                     Name = r.Name,
@@ -257,10 +257,10 @@ namespace QuestHelper.Server.Controllers.v2
                         DateTimeBegin = p.DateTimeBegin,
                         DateTimeEnd = p.DateTimeEnd,
                     }).OrderBy(p=>p.DateTimeBegin).ToArray()
-                }).ToList();
+                }).FirstOrDefault();
             }
             _logger.LogInformation($"GetRoutesTracks");
-            return Json(tracks, new JsonSerializerSettings(){NullValueHandling = NullValueHandling.Ignore});
+            return Json(track, new JsonSerializerSettings(){NullValueHandling = NullValueHandling.Ignore});
         }
         
         [HttpPost("{RouteId}/tracks")]

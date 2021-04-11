@@ -11,8 +11,8 @@ namespace QuestHelper.SharedModelsWS
         public string Description { get; set; }
         public int Version { get; set; }
         public bool IsDeleted { get; set; }
-        public int CountTrackPlaces { get; set; }
-        public int CountTrackGeopoints { get; set; }
+        public int? CountTrackPlaces { get; set; }
+        public int? CountTrackGeopoints { get; set; }
         public RouteTrackingPlace[] Places { get; set; }
 
         public class RouteTrackingPlace
@@ -24,7 +24,7 @@ namespace QuestHelper.SharedModelsWS
             public string Category { get; set; }
             public string Distance { get; set; }
             public DateTime DateTimeBegin { get; set; }        
-            public DateTime DateTimeEnd { get; set; }        
+            public DateTime? DateTimeEnd { get; set; }        
             public double? Latitude { get; set; }
             public double? Longitude { get; set; }
         }
