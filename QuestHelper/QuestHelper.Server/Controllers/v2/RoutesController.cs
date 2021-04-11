@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
+using Newtonsoft.Json;
 using Pomelo.EntityFrameworkCore.MySql.Query.ExpressionTranslators.Internal;
 using QuestHelper.Server.Models.v2;
 using QuestHelper.SharedModelsWS;
@@ -228,7 +229,7 @@ namespace QuestHelper.Server.Controllers.v2
 
         [HttpGet("{RouteId}/tracks")]
         [ProducesResponseType(200)]
-        public IActionResult GetRoutesTracks(string RouteId)
+        public JsonResult GetRoutesTracks(string RouteId)
         {
             List<RouteTracking> tracks = new List<RouteTracking>();
             string userId = IdentityManager.GetUserId(HttpContext);
@@ -236,7 +237,7 @@ namespace QuestHelper.Server.Controllers.v2
             {
                 tracks = db.RouteTrack.Where(r => r.RouteId.Equals(RouteId) && !r.IsDeleted).Select(r => new RouteTracking()
                 {
-                    Id = "0x" + BitConverter.ToString(r.Id).Replace("-",""),
+                    Id = BitConverter.ToString(r.Id).Replace("-",""),
                     Name = r.Name,
                     Description = r.Description,
                     Version = r.Version,
@@ -245,11 +246,12 @@ namespace QuestHelper.Server.Controllers.v2
                     RouteId = r.RouteId,
                     Places = db.RouteTrackPlace.Where(p=>p.RouteTrackId.Equals(r.Id)).Select(p=>new RouteTracking.RouteTrackingPlace()
                     {
+                        Id = BitConverter.ToString(p.Id).Replace("-",""),
                         Name = p.Name,
-                        //Description = p.Description,
-                        //Address = p.Address,
-                        //Category = p.Category,
-                        //Distance = p.Distance,
+                        Description = p.Description,
+                        Address = p.Address,
+                        Category = p.Category,
+                        Distance = p.Distance,
                         Latitude = p.Latitude,
                         Longitude = p.Longitude,
                         DateTimeBegin = p.DateTimeBegin,
@@ -257,9 +259,8 @@ namespace QuestHelper.Server.Controllers.v2
                     }).OrderBy(p=>p.DateTimeBegin).ToArray()
                 }).ToList();
             }
-
             _logger.LogInformation($"GetRoutesTracks");
-            return new ObjectResult(tracks);
+            return Json(tracks, new JsonSerializerSettings(){NullValueHandling = NullValueHandling.Ignore});
         }
         
         [HttpPost("{RouteId}/tracks")]
