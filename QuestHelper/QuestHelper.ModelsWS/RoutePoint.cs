@@ -18,5 +18,8 @@ namespace QuestHelper.SharedModelsWS
         public double? Longitude { get; set; }
         public string Address { get; set; }
         public string Description { get; set; }
+        public int LikeCount { get; set; }
+        public bool LikedByCurrentUser { get; set; }
+        public string LastComment { get; set; }
     }
 }

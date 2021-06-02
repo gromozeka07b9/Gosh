@@ -27,7 +27,8 @@ namespace QuestHelper.Server.Controllers.Account
                     username = user.Name,
                     email = user.Email,
                     userid = user.UserId,
-                    role = user.Role
+                    role = user.Role,
+                    img_url = user.ImgUrl
                 };
 
                 // сериализация ответа

@@ -96,6 +96,8 @@ namespace QuestHelper.Server.Controllers.v2
                         Version = route.Version,
                         CreatorName = (from users in db.User where users.UserId.Equals(route.CreatorId) select users.Name).FirstOrDefault(),
                         LikeCount = db.RouteLike.Count(r=>r.RouteId.Equals(route.RouteId) && r.IsLike == 1),
+                        LikedByCurrentUser = db.RouteLike.Any(r=>r.RouteId.Equals(route.RouteId) && r.IsLike == 1 && r.UserId.Equals(userId)),
+                        LastComment = String.Empty,
                         DislikeCount = db.RouteLike.Count(r=>r.RouteId.Equals(route.RouteId) && r.IsLike == 0),
                         ViewCount = db.RouteView.Count(r=>r.RouteId.Equals(route.RouteId)),
                         PointCount = db.RoutePoint.Count(rp=>rp.RouteId.Equals(route.RouteId) && !rp.IsDeleted),

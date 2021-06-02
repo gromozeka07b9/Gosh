@@ -116,6 +116,11 @@
             <param name="id">routepointmediaobjectId</param>
             <returns></returns>
         </member>
+        <member name="T:QuestHelper.Server.Controllers.v2.CommentsController">
+            <summary>
+            CRUD for route points
+            </summary>
+        </member>
         <member name="T:QuestHelper.Server.Controllers.v2.PoisController">
             <summary>
             Getting poi

@@ -8,6 +8,7 @@
     <NeutralLanguage>en</NeutralLanguage>
     <AssemblyVersion>1.1.66.0</AssemblyVersion>
     <PackageVersion>1.1.66.0</PackageVersion>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

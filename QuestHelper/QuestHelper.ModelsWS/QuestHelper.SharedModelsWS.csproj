@@ -7,6 +7,7 @@
     <Title>Gosh API models</Title>
     <Authors>Sergey Dyachenko</Authors>
     <Description>shared models for app</Description>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
 
 </Project>

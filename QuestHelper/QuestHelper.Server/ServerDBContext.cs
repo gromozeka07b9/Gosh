@@ -33,6 +33,7 @@ namespace QuestHelper.Server
         public DbSet<OauthUser> OauthUser { get; set; }
         public DbSet<RouteTrack> RouteTrack { get; set; }
         public DbSet<RouteTrackPlace> RouteTrackPlace { get; set; }
+        public DbSet<Comment> Comment { get; set; }
 
         public static DbContextOptions<ServerDbContext> GetOptionsContextDbServer(IConfiguration configuration, bool isFake = false)
         {
