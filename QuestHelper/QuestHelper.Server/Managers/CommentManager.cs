@@ -16,7 +16,7 @@ namespace QuestHelper.Server.Managers
             _db = db;
         }
 
-        public async Task<bool> Add(string userId, string routeId, string parentCommentId, bool isRelationRoute, string text)
+        public async Task<bool> Add(string userId, string routeId, string parentCommentId, int objectType, string text)
         {
             using (var db = new ServerDbContext(_db))
             {
@@ -26,7 +26,7 @@ namespace QuestHelper.Server.Managers
                     CreatorId = Guid.Parse(userId).ToByteArray(),
                     ParentId = !string.IsNullOrEmpty(parentCommentId) ? Guid.Parse(parentCommentId).ToByteArray() : null,
                     RelationObjectId = Guid.Parse(routeId).ToByteArray(),
-                    RelationObjectType = isRelationRoute ? 0 : 1,
+                    RelationObjectType = objectType,
                     CreateDate = DateTime.Now,
                     Text = text,
                     IsDeleted = false

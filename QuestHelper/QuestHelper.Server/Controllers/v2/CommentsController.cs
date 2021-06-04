@@ -28,25 +28,48 @@ namespace QuestHelper.Server.Controllers.v2
             _commentManager = new CommentManager(_dbOptions);
         }
 
-        /*[HttpGet("{RoutePointId}")]
-        public IActionResult Get(string RoutePointId)
+        [HttpGet("routes/{RelationObjectId}")]
+        public IActionResult GetRouteComments(string relationObjectId)
         {
             string userId = IdentityManager.GetUserId(HttpContext);
-            RoutePoint point = new RoutePoint();
+            return getCommentByIdAndType(relationObjectId, 0);
+        }
+
+        [HttpGet("points/{RelationObjectId}")]
+        public IActionResult GetRoutePointComments(string relationObjectId)
+        {
+            string userId = IdentityManager.GetUserId(HttpContext);
+            return getCommentByIdAndType(relationObjectId, 1);
+        } 
+        private IActionResult getCommentByIdAndType(string relationObjectId, int objectType)
+        {
+            var objectIdAsBytesArray = relationObjectId.Contains('-')
+                ? Guid.Parse(relationObjectId).ToByteArray()
+                : System.Text.Encoding.ASCII.GetBytes(relationObjectId);
             using (var db = new ServerDbContext(_dbOptions))
             {
                 var publishRoutes = db.Route.Where(r => r.IsPublished && r.IsDeleted == false).Select(r => r.RouteId).ToList();
-                var routeaccess = db.RouteAccess.Where(u => u.UserId == userId).Select(u => u.RouteId).ToList();
-                point = db.RoutePoint.SingleOrDefault(x => x.RoutePointId == RoutePointId && (routeaccess.Contains(x.RouteId) || (publishRoutes.Contains(x.RouteId))));
+                //objectType: 0 - route, 1 - routePoint
+                var comments = db.Comment.Where(c => c.RelationObjectId.Equals(objectIdAsBytesArray) && !c.IsDeleted && c.RelationObjectType.Equals(objectType))
+                    .OrderBy(c=>c.CreateDate)
+                    .Select(c => new
+                    {
+                        Id = new Guid(c.Id),
+                        c.CreateDate,
+                        CreatorId = new Guid(c.CreatorId),
+                        ParentId = c.ParentId != null ? new Guid(c.ParentId).ToString() : String.Empty,
+                        RelationObjectId = new Guid(c.RelationObjectId),
+                        c.Text
+                    }).ToList();
+                return new ObjectResult(comments);
             }
-            return new ObjectResult(point);
-        }*/
+        }
 
         [HttpPost]
         public async Task<StatusCodeResult> Post([FromBody] SharedModelsWS.Comment comment)
         {
             string userId = IdentityManager.GetUserId(HttpContext);
-            if (await _commentManager.Add(userId, comment.RelationObjectId, comment.ParentId, true, comment.Text))
+            if (await _commentManager.Add(userId, comment.RelationObjectId, comment.ParentId, comment.RelationObjectType, comment.Text))
             {
                 return Ok();
             }
