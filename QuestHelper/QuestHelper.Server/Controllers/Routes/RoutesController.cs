@@ -244,16 +244,19 @@ namespace QuestHelper.Server.Controllers.Routes
         public void MakeRouteShared(string RouteId)
         {
             string userId = IdentityManager.GetUserId(HttpContext);
+
+            List<RoutePointMediaObject> mediaObjectsForPublish = new List<RoutePointMediaObject>();
+            
             using (var db = new ServerDbContext(_dbOptions))
             {
-                if (db.Route.Where(r => r.CreatorId == userId && r.RouteId == RouteId).Any())
+                if (db.Route.Any(r => r.CreatorId == userId && r.RouteId == RouteId))
                 {
-                    if (!db.RouteShare.Where(s => s.RouteId == RouteId && s.UserId == userId).Any())
+                    if (!db.RouteShare.Any(s => s.RouteId == RouteId && s.UserId == userId))
                     {
                         string shareShortId = IdGenerator.Generate(7);
                         if (!string.IsNullOrEmpty(shareShortId))
                         {
-                            if (!db.RouteShare.Where(rs => rs.ReferenceHash.Equals(shareShortId)).Any())
+                            if (!db.RouteShare.Any(rs => rs.ReferenceHash.Equals(shareShortId)))
                             {
                                 RouteShare shareObject = new RouteShare();
                                 shareObject.RouteShareId = Guid.NewGuid().ToString();
@@ -266,6 +269,12 @@ namespace QuestHelper.Server.Controllers.Routes
                             }
                             else Response.StatusCode = 500;
                         } else Response.StatusCode = 500;
+                        
+                        mediaObjectsForPublish = (from media in db.RoutePointMediaObject
+                            join point in db.RoutePoint on media.RoutePointId equals point.RoutePointId
+                            where point.RouteId.Equals(RouteId) && !point.IsDeleted && !media.IsDeleted
+                            select media).ToList();
+
                     }
                 }
                 else
@@ -273,6 +282,10 @@ namespace QuestHelper.Server.Controllers.Routes
                     Response.StatusCode = 401;
                 }
             }
+            
+            MediaManager mediaManager = new MediaManager();
+            mediaManager.PublishImages(mediaObjectsForPublish);
+            
             Response.StatusCode = 200;
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using QuestHelper.Server.Models;
 
 namespace QuestHelper.Server.Managers
 {
@@ -76,6 +77,33 @@ namespace QuestHelper.Server.Managers
                 Console.WriteLine(e);
             }
             return String.Empty;
+        }
+        
+        public void PublishImages(List<RoutePointMediaObject> mediaObjects)
+        {
+            foreach (var media in mediaObjects)
+            {
+                string filePrefix = media.MediaType == MediaObjectTypeEnum.Image ? "img" : "audio";
+                string fileExtension = media.MediaType == MediaObjectTypeEnum.Image ? "jpg" : "3gp";
+                string imgFileName = $"{filePrefix}_{media.RoutePointMediaObjectId.ToLowerInvariant()}.{fileExtension}";
+                if (!SharedMediaFileExist(imgFileName))
+                {
+                    bool copied = CopyMediaFileToSharedCatalog(imgFileName);
+                    if (!copied)
+                    {
+                        Console.WriteLine("Error while coping file:" + imgFileName);
+                    }
+                }
+
+                if (media.MediaType == MediaObjectTypeEnum.Image)
+                {
+                    string imgPreviewFileName = $"{filePrefix}_{media.RoutePointMediaObjectId.ToLowerInvariant()}_preview.{fileExtension}";
+                    if (!SharedMediaFileExist(imgPreviewFileName))
+                    {
+                        CopyMediaFileToSharedCatalog(imgPreviewFileName);
+                    }
+                }
+            }
         }
     }
 }

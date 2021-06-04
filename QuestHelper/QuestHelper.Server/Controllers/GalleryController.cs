@@ -33,7 +33,7 @@ namespace QuestHelper.Server.Controllers
             string routeId = string.Empty;//будет другой объект
 
             List<GalleryItemModel> galleryItems = new List<GalleryItemModel>();
-
+            List<RoutePointMediaObject> mediaObjectsForPublish = new List<RoutePointMediaObject>();
             using (var db = new ServerDbContext(_dbOptions))
             {
                 var routeIds = from share in db.RouteShare
@@ -57,9 +57,12 @@ namespace QuestHelper.Server.Controllers
                                 join point in db.RoutePoint on media.RoutePointId equals point.RoutePointId
                                 where point.RouteId == resultRoute.RouteId && !point.IsDeleted && !media.IsDeleted
                                 orderby point.CreateDate
-                                select new GalleryItemModel() { PointName = point.Name, PointDescription = point.Description, ImgId = media.RoutePointMediaObjectId };
+                                select new GalleryItemModel() { PointName = point.Name, PointDescription = point.Description, ImgId = media.RoutePointMediaObjectId};
 
                     galleryItems = query.ToList();
+
+                    mediaObjectsForPublish = db.RoutePointMediaObject.Where(o =>
+                        galleryItems.Select(g => g.ImgId).Contains(o.RoutePointMediaObjectId)).ToList();
                 }
             }
             ViewData["RouteName"] = resultRoute.Name;
@@ -67,25 +70,12 @@ namespace QuestHelper.Server.Controllers
             ViewData["RouteDefaultImgUrl"] = galleryItems.Count > 0 ? $"../shared/img_{galleryItems[0].ImgId}_preview.jpg" : "http://igosh.pro/images/icon.png";
 
             MediaManager mediaManager = new MediaManager();
-            foreach (var mediaItem in galleryItems)
-            {
-                string imgFileName = $"img_{mediaItem.ImgId.ToLowerInvariant()}.jpg";
-                string imgPreviewFileName = $"img_{mediaItem.ImgId.ToLowerInvariant()}_preview.jpg";
-                if (!mediaManager.SharedMediaFileExist(imgFileName))
-                {
-                    bool copied = mediaManager.CopyMediaFileToSharedCatalog(imgFileName);
-                    if (!copied)
-                    {
-                        Console.WriteLine("Error while coping file:" + imgFileName);
-                    }
-                }
-                if (!mediaManager.SharedMediaFileExist(imgPreviewFileName))
-                {
-                    mediaManager.CopyMediaFileToSharedCatalog(imgPreviewFileName);
-                }
-            }
+            mediaManager.PublishImages(mediaObjectsForPublish);
+            
             return View(galleryItems);
         }
+
+
     }
 
     public class GalleryItemModel
