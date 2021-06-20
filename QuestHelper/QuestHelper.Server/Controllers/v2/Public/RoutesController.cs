@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using QuestHelper.Server.Auth;
 using QuestHelper.Server.Managers;
 using QuestHelper.Server.Models;
 
@@ -40,6 +42,8 @@ namespace QuestHelper.Server.Controllers.v2.Public
             int pageNumber = pagingParameters.IndexesRangeToPageNumber(pagingParameters.Range, pagingParameters.PageSize);
             int totalCountRows = 0;
             List<SharedModelsWS.Route> items = new List<SharedModelsWS.Route>();
+            var userIdClaim = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
+            string userId = userIdClaim != null ? userIdClaim.Value : String.Empty;
             if (!string.IsNullOrEmpty(pagingParameters.Range))
             {
                 using (var db = new ServerDbContext(_dbOptions))
@@ -67,6 +71,7 @@ namespace QuestHelper.Server.Controllers.v2.Public
                             Version = route.Version,
                             CreatorName = (from users in db.User where users.UserId.Equals(route.CreatorId) select users.Name).FirstOrDefault(),
                             LikeCount = db.RouteLike.Count(r=>r.RouteId.Equals(route.RouteId) && r.IsLike == 1),
+                            LikedByCurrentUser = !string.IsNullOrEmpty(userId) ? db.RouteLike.Any(r=>r.RouteId.Equals(route.RouteId) && r.IsLike == 1 && r.UserId.Equals(userId)) : false,
                             DislikeCount = db.RouteLike.Count(r=>r.RouteId.Equals(route.RouteId) && r.IsLike == 0),
                             ViewCount = db.RouteView.Count(r=>r.RouteId.Equals(route.RouteId)),
                             PointCount = db.RoutePoint.Count(rp=>rp.RouteId.Equals(route.RouteId))

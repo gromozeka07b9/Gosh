@@ -109,10 +109,17 @@ namespace QuestHelper.Server.Controllers.Routes
                     }
                     routeObject.VersionsHash = string.Empty;
                     routeObject.VersionsList = string.Empty;
+                    routeObject.UpdateDate = DateTime.Now;
                     db.Entry(entity).CurrentValues.SetValues(routeObject);
                     if (!string.IsNullOrEmpty(routeObject.CoverImgBase64))
                     {
                         Base64Manager.SaveBase64ToFile(routeObject.CoverImgBase64, Path.Combine(_pathToMediaCatalog, routeObject.ImgFilename));
+                        if (routeObject.IsPublished)
+                        {
+                            MediaManager mediaManager = new MediaManager();
+                            var copyResult = mediaManager.CopyMediaFileToSharedCatalog(routeObject.ImgFilename);
+                            if(!copyResult) Console.WriteLine($"Error copy file to shared {routeObject.ImgFilename}");
+                        }
                     }
                 }
                 db.SaveChanges();

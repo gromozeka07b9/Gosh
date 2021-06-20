@@ -13,6 +13,7 @@ namespace QuestHelper.Server.Models
         public string RouteId { get; set; }
         public string Name { get; set; }
         public DateTime CreateDate { get; set; }
+        public DateTime UpdateDate { get; set; }
         /// <summary>
         /// Версия записи
         /// </summary>
