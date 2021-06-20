@@ -3,7 +3,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:31192/",
+      "applicationUrl": "http://localhost:31192",
       "sslPort": 0
     }
   },
@@ -20,7 +20,7 @@
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "api",
-      "applicationUrl": "http://localhost:31192/",
+      "applicationUrl": "http://localhost:31192",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "GoshYandexFolderId": "",

@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using QuestHelper.Server.Auth;
 using Swashbuckle.AspNetCore.Swagger;
 using System.IO;
+using Microsoft.OpenApi.Models;
 
 namespace QuestHelper.Server
 {
@@ -39,33 +40,35 @@ namespace QuestHelper.Server
                 });
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowAll",
+                options.AddDefaultPolicy(
                     builder =>
                     {
                         builder
-                        .AllowAnyOrigin()
                         .AllowAnyMethod()
                         .AllowAnyHeader()
-                        .AllowCredentials();
+                        .AllowCredentials()
+                        .SetIsOriginAllowed(hostname => true);
                     });
             });
             services.AddMvc();
             services.AddDbContext<ServerDbContext>();
             services.AddScoped<RequestFilter>();
-            services.AddSwaggerGen(
+            services.AddSwaggerGen(c => {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Gosh Api", Version = "v1" });
+            });
+            /*services.AddSwaggerGen(
                 sw =>
                 {
-                    //ToDo: Не работает после апдейта на 5.3.1
-                    /*sw.SwaggerDoc("v1",
+                    sw.SwaggerDoc("v1",
                         new Info()
  {
                             Title = "GoSh! API", Version = "v1", Description = "Api for GoSh! applications",
                             Contact = new Contact() {Name = "Sergey Dyachenko", Email = "sdyachenko1977@gmail.com"}
-                        });*/
+                        });
                     var filePath = Path.Combine(System.AppContext.BaseDirectory, "QuestHelper.Server.xml");
                     sw.IncludeXmlComments(filePath);
                 }
-           );
+           );*/
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -76,17 +79,15 @@ namespace QuestHelper.Server
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseRouting();
             app.UseAuthentication();
-            app.UseCors("AllowAll");
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Gallery}/{action=Gallery}/{id?}");
-            });
+            app.UseAuthorization();
+            //app.UseCors("AllowAll");
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
+
             app.UseStaticFiles();
             app.UseSwagger();
-            app.UseSwaggerUI(sw => sw.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
+            app.UseSwaggerUI(sw => sw.SwaggerEndpoint("/swagger/v1/swagger.json", "Gosh API v1"));
         }
     }
 }

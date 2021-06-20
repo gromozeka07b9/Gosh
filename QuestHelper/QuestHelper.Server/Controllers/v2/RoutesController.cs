@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Serialization;
@@ -262,7 +263,11 @@ namespace QuestHelper.Server.Controllers.v2
                 }).FirstOrDefault();
             }
             _logger.LogInformation($"GetRoutesTracks");
-            return Json(track, new JsonSerializerSettings(){NullValueHandling = NullValueHandling.Ignore});
+            JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions()
+            {
+                IgnoreNullValues = true
+            };
+            return Json(track, jsonSerializerOptions);
         }
         
         [HttpPost("{RouteId}/tracks")]

@@ -3,10 +3,10 @@ namespace QuestHelper.Server.Auth
 {
     public class OAuthTokenRequest
     {
-        public string Username = string.Empty;
-        public string Email = string.Empty;
-        public string Locale = string.Empty;
-        public string ImgUrl = string.Empty;
-        public string AuthenticatorUserId = string.Empty;
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public string Locale { get; set; }
+        public string ImgUrl { get; set; }
+        public string AuthenticatorUserId { get; set; }
     }
 }

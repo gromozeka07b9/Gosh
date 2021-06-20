@@ -33,11 +33,8 @@ namespace QuestHelper.Server.Controllers.Account
         {
             using (var _db = new ServerDbContext(_dbOptions))
             {
-                User user = _db.User.FirstOrDefault(x => x.Name == request.Username && x.Password == request.Password);
-                if (user == null)
-                {
-                    user = _db.User.FirstOrDefault(x => x.Email == request.Username && x.Password == request.Password);
-                }
+                User? user = _db.User.FirstOrDefault(x => x.Name == request.Username && x.Password == request.Password) ??
+                             _db.User.FirstOrDefault(x => x.Email == request.Username && x.Password == request.Password);
                 if (user != null)
                 {
                     JwtResponseMaker jwtMaker = new JwtResponseMaker();

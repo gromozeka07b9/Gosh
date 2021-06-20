@@ -55,13 +55,13 @@ namespace QuestHelper.Server.Controllers.v2.Public
                             PublicReferenceHash = share.ReferenceHash,
                             CreateDate = route.CreateDate,
                             CreatorId = route.CreatorId,
-                            Description = route.Description,
-                            ImgFilename = route.ImgFilename,
-                            FirstImageName = getFirstImageFilename(db.RoutePointMediaObject
+                            Description = string.IsNullOrEmpty(route.Description) ? String.Empty : route.Description,
+                            ImgFilename = string.IsNullOrEmpty(route.ImgFilename) ? String.Empty : route.ImgFilename,
+                            FirstImageName = (db.RoutePointMediaObject
                                 .FirstOrDefault(m => !m.IsDeleted && m.MediaType == MediaObjectTypeEnum.Image && m.ImageLoadedToServer
                                              && m.RoutePointId.Equals(db.RoutePoint
                                                  .Where(rp=>rp.RouteId.Equals(route.RouteId) && !rp.IsDeleted)
-                                                 .OrderBy(rp=>rp.CreateDate).FirstOrDefault().RoutePointId)).RoutePointMediaObjectId) ,                            
+                                                 .OrderBy(rp=>rp.CreateDate).FirstOrDefault().RoutePointId)).RoutePointMediaObjectId),                            
                             IsDeleted = route.IsDeleted,
                             IsPublished = route.IsPublished,
                             IsShared = route.IsShared,
@@ -88,7 +88,13 @@ namespace QuestHelper.Server.Controllers.v2.Public
                     }
 
                     totalCountRows = withoutFilter.Count();
-                    items = withoutFilter.OrderByDescending(r => r.CreateDate).Skip((pageNumber - 1) * pagingParameters.PageSize).Take(pagingParameters.PageSize).ToList();
+                    var onePage = withoutFilter.OrderByDescending(r => r.CreateDate)
+                        .Skip((pageNumber - 1) * pagingParameters.PageSize).Take(pagingParameters.PageSize).ToList();
+                    foreach (var route in onePage)
+                    {
+                        route.FirstImageName = getFirstImageFilename(route.FirstImageName);
+                    }
+                    items = onePage;
                 }
             }
             HttpContext.Response.Headers.Add("x-total-count", totalCountRows.ToString());

@@ -3,8 +3,8 @@ namespace QuestHelper.Server.Auth
 {
     public class TokenRequest
     {
-        public string Username = string.Empty;
-        public string Email = string.Empty;
-        public string Password = string.Empty;
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
     }
 }
