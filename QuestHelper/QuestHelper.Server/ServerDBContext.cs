@@ -37,11 +37,11 @@ namespace QuestHelper.Server
 
         public static DbContextOptions<ServerDbContext> GetOptionsContextDbServer(IConfiguration configuration, bool isFake = false)
         {
-            if (isFake)
+            /*if (isFake)
             {
                 return new DbContextOptionsBuilder<ServerDbContext>().UseInMemoryDatabase(databaseName: "for unit test").Options;
             }
-            else
+            else*/
             {
                 string dbLogin = configuration.GetValue<string>("GoshDbLogin");
                 string dbPassword = configuration.GetValue<string>("GoshDbPassword");
@@ -53,7 +53,7 @@ namespace QuestHelper.Server
                 }
 
                 string connectionString = $@"Data Source=igosh.pro; Database=questhelper; User Id={dbLogin}; Password={dbPassword};";
-                return new DbContextOptionsBuilder<ServerDbContext>().UseMySql(connectionString).Options;
+                return new DbContextOptionsBuilder<ServerDbContext>().UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)).Options;
             }
         }
         

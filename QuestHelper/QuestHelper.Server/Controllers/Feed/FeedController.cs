@@ -81,7 +81,7 @@ namespace QuestHelper.Server.Controllers
                                         ) as isUserLikes
                                         on r.RouteId = isUserLikes.RouteId
                                         where r.IsDeleted = 0 and r.IsPublished";
-                var routesDbResult = db.FeedItem.FromSql(queryText, userId);
+                var routesDbResult = db.FeedItem.FromSqlRaw(queryText, userId);
                 var wsRoutes = from r in routesDbResult select new FeedItem() 
                 { 
                     Id = r.RouteId,

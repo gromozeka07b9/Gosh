@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using MySql.Data.MySqlClient;
 
 namespace QuestHelper.Server.Models.v2.Public
 {

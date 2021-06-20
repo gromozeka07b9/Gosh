@@ -5,15 +5,10 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
-using Newtonsoft.Json;
 using QuestHelper.Server.Managers;
 using QuestHelper.Server.Models;
-using Route = Microsoft.AspNetCore.Routing.Route;
 
 namespace QuestHelper.Server.Controllers.Medias
 {

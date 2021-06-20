@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Xabe.FFmpeg;
-using Xabe.FFmpeg.Enums;
 using static QuestHelper.Server.Integration.SpeechToTextRequest;
 
 namespace QuestHelper.Server.Integration
