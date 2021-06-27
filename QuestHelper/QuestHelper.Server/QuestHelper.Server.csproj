@@ -6,8 +6,8 @@
     <Version>1.1.50</Version>
     <Configurations>Debug;Release</Configurations>
     <NeutralLanguage>en</NeutralLanguage>
-    <AssemblyVersion>1.1.68.0</AssemblyVersion>
-    <PackageVersion>1.1.68.0</PackageVersion>
+    <AssemblyVersion>1.2.1.0</AssemblyVersion>
+    <PackageVersion>1.2.1.0</PackageVersion>
     <LangVersion>latestmajor</LangVersion>
     <Nullable>disable</Nullable>
   </PropertyGroup>

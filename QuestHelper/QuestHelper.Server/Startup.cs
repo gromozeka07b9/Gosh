@@ -56,19 +56,6 @@ namespace QuestHelper.Server
             services.AddSwaggerGen(c => {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Gosh Api", Version = "v1" });
             });
-            /*services.AddSwaggerGen(
-                sw =>
-                {
-                    sw.SwaggerDoc("v1",
-                        new Info()
- {
-                            Title = "GoSh! API", Version = "v1", Description = "Api for GoSh! applications",
-                            Contact = new Contact() {Name = "Sergey Dyachenko", Email = "sdyachenko1977@gmail.com"}
-                        });
-                    var filePath = Path.Combine(System.AppContext.BaseDirectory, "QuestHelper.Server.xml");
-                    sw.IncludeXmlComments(filePath);
-                }
-           );*/
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
