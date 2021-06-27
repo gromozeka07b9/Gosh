@@ -20,17 +20,28 @@ namespace QuestHelper.Server.Managers
         
         public List<RouteVersion> Calc(List<Models.Route> routes)
         {
-            List<RouteVersion> routeVersions;
+            IEnumerable<RouteVersion> routeVersions;
 
             using (var db = new ServerDbContext(_dbOptions))
             {
-                routeVersions = routes.Select(r => new RouteVersion() {Id = r.RouteId, Version = r.Version, ObjVerHash = r.VersionsHash, ObjVer = r.VersionsList}).ToList();
-                var pointIds = db.RoutePoint.Where(p => routeVersions.Any(r => r.Id == p.RouteId))
-                    .Select(p => new {p.RouteId, p.RoutePointId, p.Version}).ToList();
-                var mediaIds = db.RoutePointMediaObject
-                    .Where(m => pointIds.Any(p => p.RoutePointId == m.RoutePointId))
-                    .Select(m => new {m.RoutePointMediaObjectId, m.Version, m.RoutePointId})
-                    .ToList();
+                routeVersions = from route in routes select new RouteVersion()
+                    {Id = route.RouteId, Version = route.Version, ObjVerHash = route.VersionsHash, ObjVer = route.VersionsList};
+                var pointIds = from point in db.RoutePoint
+                    join version in routeVersions
+                        on point.RouteId equals version.Id
+                    select new
+                    {
+                        RouteId = point.RouteId, RoutePointId = point.RoutePointId, Version = version.Version
+                    };
+                
+                var mediaIds = from media in db.RoutePointMediaObject
+                    join point in pointIds
+                        on media.RoutePointId equals point.RoutePointId
+                    select new
+                    {
+                        media.RoutePointMediaObjectId, point.Version, media.RoutePointId
+                    };
+                
                 foreach (var route in routeVersions)
                 {
                     if (string.IsNullOrEmpty(route.ObjVerHash))
@@ -59,7 +70,7 @@ namespace QuestHelper.Server.Managers
                 }
             }
 
-            return routeVersions;
+            return routeVersions.ToList();
         }
 
     }

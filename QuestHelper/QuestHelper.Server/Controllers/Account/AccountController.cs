@@ -134,8 +134,8 @@ namespace QuestHelper.Server.Controllers.Account
             return;
         }              
 
-        [Authorize]
-        [ServiceFilter(typeof(RequestFilter))]
+        //[Authorize]
+        //[ServiceFilter(typeof(RequestFilter))]
         [HttpGet("{userId}")]
         public IActionResult Get(string userId)
         {

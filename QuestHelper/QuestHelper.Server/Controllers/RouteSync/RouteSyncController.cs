@@ -66,7 +66,6 @@ namespace QuestHelper.Server.Controllers.RouteSync
 
             List<RouteVersion> routeVersions = _routeHashUpdater.Calc(routes);
             
-            //List<RouteVersion> routeVersions = makeRoutesVersion(routes);
 
             TimeSpan delay = DateTime.Now - startDate;
             Console.WriteLine($"GetRouteData full: status 200, {userId}, delay:{delay.TotalMilliseconds}");
@@ -201,7 +200,7 @@ namespace QuestHelper.Server.Controllers.RouteSync
 
             TimeSpan delay = DateTime.Now - startDate;
             Console.WriteLine($"GetRouteData by Id: status 200, {userId}, {routeId}, delay:{delay.TotalMilliseconds}");
-            return new ObjectResult(routeRoot);
+            return new JsonResult(routeRoot);
         }
 
         /// <summary>

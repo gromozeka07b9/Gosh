@@ -7,7 +7,7 @@ namespace QuestHelper.SharedModelsWS
 {
     public class RouteRoot
     {
-        public Route Route;
+        public Route Route { get; set; }
 
         public RouteRoot()
         {

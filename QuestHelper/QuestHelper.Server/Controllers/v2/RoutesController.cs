@@ -79,12 +79,17 @@ namespace QuestHelper.Server.Controllers.v2
                     totalCountRows = withoutFilter.Count();                    
                     var dbRoutes = withoutFilter.OrderBy(r => r.CreateDate).Skip((pageNumber - 1) * pagingParameters.PageSize).Take(pagingParameters.PageSize);
                     
+                    DateTime test = DateTime.MinValue;
+                    
                     items = dbRoutes.Select(route => new SharedModelsWS.Route()
                     {
                         Id = route.RouteId, 
                         PublicReferenceHash = db.RouteShare.Where(r=>r.RouteId.Equals(route.RouteId)).Select(r=>r.ReferenceHash).FirstOrDefault(),
                         CreateDate = route.CreateDate,
-                        UpdateDate = db.RoutePoint.Where(rp=>!rp.IsDeleted && rp.RouteId.Equals(route.RouteId)).Select(rp=>rp.UpdateDate).DefaultIfEmpty(route.CreateDate).Max(),
+                        UpdateDate = db.RoutePoint.Any(rp => !rp.IsDeleted && rp.RouteId.Equals(route.RouteId)) ?
+                            db.RoutePoint.Where(rp=>!rp.IsDeleted && rp.RouteId.Equals(route.RouteId)).Select(rp=>rp.UpdateDate).Max()
+                        :new DateTimeOffset?(route.CreateDate),
+                        //UpdateDate = route.UpdateDate,
                         CreatorId = route.CreatorId,
                         Description = route.Description,
                         ImgFilename = route.ImgFilename,

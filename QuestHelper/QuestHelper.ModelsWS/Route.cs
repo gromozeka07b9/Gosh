@@ -12,7 +12,7 @@ namespace QuestHelper.SharedModelsWS
         }
         
         public string Name { get; set; }
-        public DateTimeOffset UpdateDate { get; set; }
+        public DateTimeOffset? UpdateDate { get; set; }
         public string CreatorId { get; set; }
         public bool IsShared { get; set; }
         public bool IsPublished { get; set; }
