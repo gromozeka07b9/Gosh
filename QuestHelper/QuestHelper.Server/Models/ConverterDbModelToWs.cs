@@ -20,6 +20,7 @@ namespace QuestHelper.Server.Models
                 route.IsDeleted = dbRoute.IsDeleted;
                 route.Id = dbRoute.RouteId;
                 route.CreateDate = dbRoute.CreateDate;
+                route.UpdateDate = dbRoute.UpdateDate < dbRoute.CreateDate ? dbRoute.CreateDate : dbRoute.UpdateDate;
                 route.Version = dbRoute.Version;
                 route.ImgFilename = dbRoute.ImgFilename;
                 route.Description = dbRoute.Description;

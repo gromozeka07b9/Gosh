@@ -13,7 +13,9 @@ namespace QuestHelper.Server
             Log.Logger = new LoggerConfiguration().Enrich.FromLogContext().MinimumLevel.Debug().WriteTo.ColoredConsole(
                 LogEventLevel.Debug,
                 "{NewLine}{Timestamp:HH:mm:ss} [{Level}] ({CorrelationToken}) {Message}{NewLine}{Exception}"
-            ).CreateLogger();
+            )
+                .WriteTo.File("server.log", rollingInterval:RollingInterval.Day)
+                .CreateLogger();
             BuildWebHost(args).Run();
             Log.Information($"QuestHelper server started ver:{typeof(Startup).Assembly.GetName().Version.ToString()}");
         }
