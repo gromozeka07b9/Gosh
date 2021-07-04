@@ -64,7 +64,7 @@ namespace QuestHelper.Server.Controllers.RouteSync
                 routes = availRoutes.GetByUserIdWithPublished(userId);
             }
 
-            List<RouteVersion> routeVersions = _routeHashUpdater.Calc(routes);
+            List<RouteVersion> routeVersions = _routeHashUpdater.CalcAndGetHashForRoutes(routes);
             
 
             TimeSpan delay = DateTime.Now - startDate;
@@ -94,7 +94,7 @@ namespace QuestHelper.Server.Controllers.RouteSync
                 routes.Add(route);
                 if (string.IsNullOrEmpty(route?.VersionsHash))
                 {
-                    routeVersions = _routeHashUpdater.Calc(routes);
+                    routeVersions = _routeHashUpdater.CalcAndGetHashForRoutes(routes);
                 }
                 else
                 {

@@ -227,7 +227,7 @@ namespace QuestHelper.Server.Controllers.v2
                 {
                     var lstRoute = new List<Route>();
                     lstRoute.Add(entity);
-                    versions = routeHashUpdater.Calc(lstRoute);
+                    versions = routeHashUpdater.CalcAndGetHashForRoutes(lstRoute);
                 }
             }
 

@@ -10,22 +10,17 @@ namespace QuestHelper.Server
     {
         public static void Main(string[] args)
         {
+            string pathToLogFileDirectory = Environment.GetEnvironmentVariable("PathToLogFileDirectory") ?? ".";
             Log.Logger = new LoggerConfiguration().Enrich.FromLogContext().MinimumLevel.Debug().WriteTo.ColoredConsole(
                 LogEventLevel.Debug,
                 "{NewLine}{Timestamp:HH:mm:ss} [{Level}] ({CorrelationToken}) {Message}{NewLine}{Exception}"
             )
-                .WriteTo.File("server.log", rollingInterval:RollingInterval.Day)
+                .WriteTo.File($"{pathToLogFileDirectory}/gosh.log", rollingInterval:RollingInterval.Hour)
                 .CreateLogger();
             BuildWebHost(args).Run();
-            Log.Information($"QuestHelper server started ver:{typeof(Startup).Assembly.GetName().Version.ToString()}");
+            Log.Information($"Gosh server started ver:{typeof(Startup).Assembly.GetName().Version.ToString()}");
         }
-
-/*        public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .UseSerilog((hostingContext, loggerConfiguration) => loggerConfiguration
-                    .ReadFrom.Configuration(hostingContext.Configuration))
-                .Build();*/
+        
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()

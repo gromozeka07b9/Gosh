@@ -23,6 +23,7 @@
       "applicationUrl": "http://localhost:31192",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
+        "PathToLogFileDirectory": "/tmp",
         "GoshYandexFolderId": "",
         "GoshYandexApiKey": "",
         "GOSH_IMAGES_PATH": "/Users/sergeydyachenko/goshtest/pictures",
