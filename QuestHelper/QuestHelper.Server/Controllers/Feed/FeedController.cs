@@ -38,40 +38,40 @@ namespace QuestHelper.Server.Controllers
             List<FeedItem> routes = new List<FeedItem>();
             using (var db = new ServerDbContext(_dbOptions))
             {
-                string queryText = @"select r.RouteId, r.Name, r.Version, r.ImgFilename, r.CreateDate, r.CreatorId, u.Name as CreatorName, r.Description, ifnull(views.ViewCount, 0) as ViewCount, ifnull(likes.LikeCount,0) as LikeCount, ifnull(isViewed.Id, 0) as IsUserViewed, ifnull(isUserLikes.LikeCount, 0) as IsUserLikes from questhelper.Route as r 
+                string queryText = @"select r.RouteId, r.Name, r.Version, r.ImgFilename, r.CreateDate, r.CreatorId, u.Name as CreatorName, r.Description, ifnull(views.ViewCount, 0) as ViewCount, ifnull(likes.LikeCount,0) as LikeCount, ifnull(isViewed.Id, 0) as IsUserViewed, ifnull(isUserLikes.LikeCount, 0) as IsUserLikes from gosh.Route as r 
                                         left join
                                         (
 	                                        select l.RouteId, count(l.IsLike) as LikeCount from
 	                                        (
-	                                        SELECT RouteId, UserId, max(SetDate) as SetLikeDate FROM questhelper.RouteLike
+	                                        SELECT RouteId, UserId, max(SetDate) as SetLikeDate FROM gosh.RouteLike
 	                                        group by RouteId, UserId
 	                                        ) as q
-	                                        left join questhelper.RouteLike as l
+	                                        left join gosh.RouteLike as l
 	                                        on q.RouteId = l.RouteId and q.UserId = l.UserId and q.SetLikeDate = l.SetDate
 	                                        where l.IsLike = 1
 	                                        group by l.RouteId
                                         ) likes
                                         on r.RouteId = likes.RouteId
                                         left join (
-	                                        SELECT RouteId, count(ViewDate) as ViewCount FROM questhelper.RouteView
+	                                        SELECT RouteId, count(ViewDate) as ViewCount FROM gosh.RouteView
 	                                        group by RouteId
                                         ) as views
                                         on r.RouteId = views.RouteId
-                                        inner join questhelper.User as u
+                                        inner join gosh.User as u
                                         on r.CreatorId = u.UserId
-                                        left join questhelper.RouteView as isViewed
+                                        left join gosh.RouteView as isViewed
                                         on r.RouteId = isViewed.RouteId and isViewed.UserId = {0}
                                         left join(
                                             select l.RouteId, count(l.IsLike) as LikeCount from
                                             (
-                                            SELECT RouteId, UserId, max(SetDate) as SetLikeDate FROM questhelper.RouteLike
+                                            SELECT RouteId, UserId, max(SetDate) as SetLikeDate FROM gosh.RouteLike
 
                                             where UserId = {0}
 
                                             group by RouteId, UserId
                                             ) as q
 
-                                            left join questhelper.RouteLike as l
+                                            left join gosh.RouteLike as l
 
                                             on q.RouteId = l.RouteId and q.UserId = l.UserId and q.SetLikeDate = l.SetDate
 

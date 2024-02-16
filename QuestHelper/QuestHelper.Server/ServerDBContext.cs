@@ -43,17 +43,16 @@ namespace QuestHelper.Server
             }
             else*/
             {
-                string dbLogin = configuration.GetValue<string>("GoshDbLogin");
-                string dbPassword = configuration.GetValue<string>("GoshDbPassword");
-                if (string.IsNullOrEmpty(dbLogin) || string.IsNullOrEmpty(dbPassword))
+                string dbConnectionString = configuration.GetValue<string>("DbConnection");
+                if (string.IsNullOrEmpty(dbConnectionString))
                 {
-                    string errorMsg = "Error reading DB login or password!";
+                    string errorMsg = "Error reading db connection string";
                     Console.WriteLine(errorMsg);
                     throw new Exception(errorMsg);
                 }
 
-                string connectionString = $@"Data Source=igosh.pro; Database=questhelper; User Id={dbLogin}; Password={dbPassword};";
-                return new DbContextOptionsBuilder<ServerDbContext>().UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)).Options;
+                //string connectionString = $@"Data Source=igosh.pro; Database=questhelper; User Id={dbLogin}; Password={dbPassword};";
+                return new DbContextOptionsBuilder<ServerDbContext>().UseMySql(dbConnectionString, ServerVersion.AutoDetect(dbConnectionString)).Options;
             }
         }
         
